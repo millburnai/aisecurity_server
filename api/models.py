@@ -1,8 +1,12 @@
 from django.db import models
 from auditlog.registry import auditlog
+from django.contrib.auth.models import AbstractUser
 from auditlog.models import AuditlogHistoryField
 
 # Create your models here.
+
+class CustomUser(AbstractUser):
+	google_oath_token = models.CharField(max_length=512)
 
 class Student(models.Model):
 	name = models.CharField(max_length=200)

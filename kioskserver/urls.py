@@ -21,10 +21,11 @@ from api import views
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'students', views.StudentViewSet)
+router.register(r'students', views.StudentViewSet, basename="Student")
 router.register(r'transactions', views.TransactionViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
+    path('kiosks/login', views.kioskLogin),
 ]

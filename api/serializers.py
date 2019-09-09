@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import Student, Transaction, MorningMode
-
+from django.contrib.auth import get_user_model
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ['url', 'username', 'email', 'groups']
 
 
@@ -21,6 +21,7 @@ class StudentSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name', 'student_id', 'grade', 'privilege_granted', 'pathToImage']
 
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
+    student = StudentSerializer()
     class Meta:
         model = Transaction
         fields = ['id', 'kiosk_id', 'student', 'entered_id', 'timestamp', 'flag']
