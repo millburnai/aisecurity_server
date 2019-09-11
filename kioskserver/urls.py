@@ -25,7 +25,7 @@ router.register(r'students', views.StudentViewSet, basename="Student")
 router.register(r'transactions', views.TransactionViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('v1/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('kiosks/login', views.kioskLogin),
 ]
