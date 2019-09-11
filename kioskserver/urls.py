@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
 from rest_framework import routers
 from api import views
 
@@ -25,7 +26,8 @@ router.register(r'students', views.StudentViewSet, basename="Student")
 router.register(r'transactions', views.TransactionViewSet)
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
+    url(r'^v1/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('kiosks/login', views.kioskLogin),
+    url('^.*$', views.IndexWebApp, name='index')
 ]

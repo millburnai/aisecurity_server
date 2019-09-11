@@ -8,6 +8,10 @@ from django.contrib.auth import get_user_model
 from datetime import datetime, timezone
 from django.http import JsonResponse
 
+#idk if this is done right, just change it if it isn't
+def IndexWebApp(request):
+    return render(request, 'index.html')
+
 # Create your views here
 
 class UserViewSet(viewsets.ModelViewSet):
