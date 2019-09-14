@@ -73,10 +73,6 @@ class TransactionViewSet(viewsets.ModelViewSet):
         if to_datetime is not None:
             queryset = queryset.filter(timestamp__lte=to_datetime)
 
-        db_stuid = self.request.query_params.get('db_stuid', None)
-        if db_stuid is not None:
-            queryset = queryset.filter(student__id=db_stuid)
-
         student_id = self.request.query_params.get('student_id', None)
         if student_id is not None:
             queryset = queryset.filter(student__student_id=student_id)
