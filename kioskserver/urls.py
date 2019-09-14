@@ -32,7 +32,7 @@ urlpatterns = [
     path('v1/download/transactions', views.downloadTransaction),
     path('v1/morning', views.getMorningMode),
     path('v1/morning/set', views.setMorningMode),
-    path('admin/', admin.site.urls),
-    path('kiosks/login', views.kioskLogin),
-    #url('^.*$', views.IndexWebApp, name='index')
+    path('v1/admin/', admin.site.urls),
+    path('v1/kiosks/login', views.kioskLogin),
+    url('', views.IndexWebApp, name='index')
 ]
