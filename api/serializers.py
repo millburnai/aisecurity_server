@@ -18,7 +18,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Student
-        fields = ['id', 'name', 'student_id', 'grade', 'privilege_granted', 'pathToImage']
+        fields = ['student_id', 'name', 'grade', 'privilege_granted', 'pathToImage']
 
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
     student = StudentSerializer()

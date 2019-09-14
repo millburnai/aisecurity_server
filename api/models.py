@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
 
 class Student(models.Model):
 	name = models.CharField(max_length=200)
-	student_id = models.IntegerField()
+	student_id = models.IntegerField(primary_key=True)
 	grade = models.IntegerField()
 	privilege_granted = models.BooleanField()
 	pathToImage = models.CharField(max_length=200, blank=True)

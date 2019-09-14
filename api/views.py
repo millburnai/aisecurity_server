@@ -91,10 +91,9 @@ def downloadStudent(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="student_download.csv"'
     writer = csv.writer(response)
-    writer.writerow(['internal_id', 'name', 'student_id', 'grade', 'privilege_granted', 'pathToImage'])
+    writer.writerow(['name', 'student_id', 'grade', 'privilege_granted', 'pathToImage'])
     for student in Student.objects.all():
         writer.writerow([
-            student.pk,
             student.name,
             student.student_id,
             student.grade,
