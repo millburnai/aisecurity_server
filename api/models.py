@@ -23,11 +23,8 @@ class Transaction(models.Model):
 	student = models.ForeignKey(Student, models.PROTECT, null=True)
 	entered_id = models.IntegerField()
 	timestamp = models.DateTimeField()
+	morning_mode = models.BooleanField()
 	flag = models.BooleanField()
-	
-class MorningMode(models.Model):
-	beingActivated = models.BooleanField()
-	timestamp = models.DateTimeField()
-	
+
 auditlog.register(Student)
 

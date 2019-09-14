@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from .models import Student, Transaction, MorningMode, CustomUser
+from .models import Student, Transaction, CustomUser
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 class CustomUserAdmin(UserAdmin):
@@ -16,5 +16,4 @@ class CustomUserAdmin(UserAdmin):
 #admin.site.register(User)
 admin.site.register(Student)
 admin.site.register(Transaction)
-admin.site.register(MorningMode)
 admin.site.register(CustomUser, CustomUserAdmin)

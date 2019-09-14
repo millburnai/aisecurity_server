@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'auditlog',
     'rest_framework',
+    'channels',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,6 +74,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'kioskserver.wsgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
+ASGI_APPLICATION = 'api.socket.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
