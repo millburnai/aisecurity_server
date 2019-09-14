@@ -27,7 +27,12 @@ router.register(r'transactions', views.TransactionViewSet)
 
 urlpatterns = [
     url(r'^v1/', include(router.urls)),
+    path('v1/students/revert', views.revertStudent),
+    path('v1/download/students', views.downloadStudent),
+    path('v1/download/transactions', views.downloadTransaction),
+    path('v1/morning', views.getMorningMode),
+    path('v1/morning/set', views.setMorningMode),
     path('admin/', admin.site.urls),
     path('kiosks/login', views.kioskLogin),
-    url('^.*$', views.IndexWebApp, name='index')
+    #url('^.*$', views.IndexWebApp, name='index')
 ]
