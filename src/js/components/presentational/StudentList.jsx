@@ -47,10 +47,10 @@ function StudentRow(props) {
     return (
         <ListItem style={style} key={index}>
             <ListItemAvatar>
-                <Avatar alt="Avatar" src={currentStudent.pathToFile}/>
+                <Avatar alt="Avatar" src={'/static/img/' + currentStudent.pathToImage}/>
             </ListItemAvatar>
-            <ListItemText primary={currentStudent.name} secondary={`${currentStudent.id} • Grade ${currentStudent.grade}`}/>
-            {currentStudent.privilege ? <CheckIcon className={classes.yes}/> : <CloseIcon className={classes.no}/>}
+            <ListItemText primary={currentStudent.name} secondary={`${currentStudent.student_id} • Grade ${currentStudent.grade}`}/>
+            {currentStudent.privilege_granted ? <CheckIcon className={classes.yes}/> : <CloseIcon className={classes.no}/>}
             <IconButton>
                 <InfoIcon/>
             </IconButton>
@@ -72,10 +72,6 @@ class StudentList extends Component {
             students: [],
         };
     }
-    onQueryUpdate() {
-        //TODO: implement student sorting
-        this.setState({...this.state, sortedStudents: this.state.students.slice()});
-    }
 
     getStudents() {
         let params = {...this.props.parameters};
@@ -92,14 +88,7 @@ class StudentList extends Component {
 
         }).then(download=>{
             // console.log(download);
-            const downloadData = download.data;
-            const studentList = Object.keys(downloadData)
-                .map(key=>{
-                    return {
-                        ...downloadData[key],
-                        id: parseInt(key)
-                    }
-                });
+            const studentList = download.data;
             this.setState({...this.state, students: studentList});
         })
     }
@@ -119,7 +108,7 @@ class StudentList extends Component {
                 height={500}
                 itemCount={this.state.students.length}
                 itemSize={60}
-                width={this.props.windowWidth * 0.9}
+                width={this.props.windowWidth * 0.6}
             >
                 { props => <StudentRow {...props} studentList={this.state.students}/> }
             </FixedSizeList>

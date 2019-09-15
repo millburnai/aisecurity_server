@@ -19,7 +19,7 @@ import Menu from '@material-ui/core/Menu';
 
 
 const styles = theme => ({
-    root: {
+    container: {
         flexGrow: 1,
     },
     menuButton: {
@@ -61,7 +61,7 @@ class NavBar extends Component {
 
     render() {
         return (
-            <div className={this.classes.root}>
+            <div className={this.classes.container}>
                 <AppBar position="static">
                     <Toolbar>
                         <IconButton edge="start" onClick={()=>this.props.setDrawerOpen(true)} className={this.classes.menuButton} color="inherit" aria-label="menu">

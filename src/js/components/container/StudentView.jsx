@@ -41,18 +41,11 @@ class StudentView extends Component {
             },
             params: {
                 name: '',
-                id: '',
-                privilege: '',
+                student_id: '',
+                privilege_granted: '',
                 grade: '',
                 sort: '',
             },
-        };
-        console.log(this.state.params.privilege);
-        this.parameters = {
-            name: undefined,
-            id: undefined,
-            privilege: undefined,
-            grade: undefined,
         };
         this.handleChange = name => event => {
             // this.parameters[name] = event.target.value;
@@ -88,11 +81,11 @@ class StudentView extends Component {
                     />
                     <TextField
                         className={this.classes.input}
-                        value={this.state.params.id}
+                        value={this.state.params.student_id}
                         label="ID"
                         margin="normal"
                         type="number"
-                        onChange={this.handleChange('id')}
+                        onChange={this.handleChange('student_id')}
                     />
                     <TextField
                         className={this.classes.input}
@@ -107,23 +100,23 @@ class StudentView extends Component {
                         select
                         margin="normal"
                         className={this.classes.input}
-                        value={this.state.params.privilege}
-                        onChange={this.handleChange('privilege')}>
+                        value={this.state.params.privilege_granted}
+                        onChange={this.handleChange('privilege_granted')}>
                         <MenuItem value={''}>
                             <i>None</i>
                         </MenuItem>
-                        <MenuItem value={true}>
+                        <MenuItem value={1}>
                             {/*<CheckIcon className={this.classes.yes}/>*/}
                             Yes
                         </MenuItem>
-                        <MenuItem value={false}>
+                        <MenuItem value={0}>
                             {/*<CloseIcon className={this.classes.no}/>*/}
                             No
                         </MenuItem>
                     </TextField>
 
                 </Box>
-                <StudentDialog onClose={()=>{}} open={true}/>
+                {/*<StudentDialog onClose={()=>{}} open={true}/>*/}
                 <StudentList parameters={{...this.state.params}}/>
             </Box>
         );

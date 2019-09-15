@@ -47,10 +47,10 @@ function TransactionRow(props) {
     return (
         <ListItem style={ style } key={ index }>
             <ListItemAvatar>
-                <Avatar alt="Avatar" src={ transaction.student.pathToFile }/>
+                <Avatar alt="Avatar" src={ '/static/img/' + transaction.student.pathToImage }/>
             </ListItemAvatar>
             <ListItemText primary={ transaction.student.name }
-                          secondary={ `Kiosk ${ transaction.kiosk } at ${ transaction.datetime }` }/>
+                          secondary={ `Kiosk ${ transaction.kiosk_id } at ${ transaction.timestamp }` }/>
             { !transaction.flag ? <CheckIcon className={ classes.yes }/> : <CloseIcon className={ classes.no }/> }
         </ListItem>
     )
@@ -78,47 +78,17 @@ class TransactionList extends Component {
                 delete params[key];
             }
         }
-        (async function() {
-            const transactionRes = await axios.get("/v1/transactions", {
-                headers: {
-                    'Authorization': 'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token,
-                },
-                params: params
+        axios.get('/v1/transactions', {
+            headers: {
+                'Authorization': 'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token,
+            },
+            params: params
+        }).then(function(transactions) {
+            let history = transactions.data;
+            history.map(i=>{i.timestamp = new Date(i.timestamp)});
+            this.setState({...this.state, transactions: history});
+        }.bind(this))
 
-            });
-            const studentRes = await axios.get('/v1/students', {
-                headers: {
-                    'Authorization': 'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token,
-                }
-            });
-            const transactions = transactionRes.data;
-            const students = studentRes.data;
-            const transactionList = Object.keys(transactions)
-                .map(key => {
-                    let data = {};
-                    const studentId = transactions[key].studentId;
-                    if (studentId in students) {
-                        data.student = students[studentId];
-                    } else {
-                        data.student = {
-                            id: 0,
-                            name: 'NAME_NOT_FOUND',
-                            pathToFile: 'static/profile.png',
-                            grade: -1,
-                            privilege: false
-                        };
-                    }
-                    data.flag = !!transactions[key].flag;
-                    data.morning = !!transactions[key].morning;
-                    data.kiosk = transactions[key].kioskid;
-                    data.datetime = new Date(transactions[key]['date_']);
-                    const [, , hours, minutes, seconds] = transactions[key]['time_'].match(/^P(\d+)DT(\d{2})H(\d{2})M(\d{2})S$/i);
-                    data.datetime.setHours(hours, minutes, seconds);
-                    data.id = key;
-                    return data;
-                });
-            this.setState({...this.state, transactions: transactionList});
-        }).bind(this)();
     }
 
     componentDidMount() {

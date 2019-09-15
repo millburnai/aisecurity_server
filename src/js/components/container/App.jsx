@@ -15,6 +15,7 @@ import LiveView from "./LiveView.jsx";
 import LoginView from "./LoginView.jsx";
 import HomeView from "./HomeView.jsx";
 import TransactionView from "./TransactionView.jsx";
+import withStyles from "@material-ui/core/styles/withStyles";
 
 
 function PageNotFound() {
@@ -24,6 +25,7 @@ function PageNotFound() {
         </div>
     )
 }
+
 
 
 class App extends Component {
@@ -46,7 +48,7 @@ class App extends Component {
     }
     render() {
         return (
-            <React.Fragment>
+            <React.Fragment className={this.props.classes.root}>
                 <CssBaseline />
                 <Router>
                     <SideNav open={this.state.sidenavOpen} setDrawerOpen={isOpen => this.setState({...this.state, sidenavOpen: isOpen})}/>
@@ -80,4 +82,4 @@ function Home() {
 }
 
 
-export default App;
+export default withStyles(styles)(App);
