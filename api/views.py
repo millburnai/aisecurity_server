@@ -60,7 +60,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
         kiosk_id = self.request.query_params.get('kiosk_id', None)
         if kiosk_id is not None:
             queryset = queryset.filter(kiosk_id=kiosk_id)
-        
+
         entered_id = self.request.query_params.get('entered_id', None)
         if entered_id is not None:
             queryset = queryset.filter(entered_id=entered_id)
@@ -68,7 +68,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
         from_datetime = self.request.query_params.get('from_datetime', None)
         if from_datetime is not None:
             queryset = queryset.filter(timestamp__gte=from_datetime)
-        
+
         to_datetime = self.request.query_params.get('to_datetime', None)
         if to_datetime is not None:
             queryset = queryset.filter(timestamp__lte=to_datetime)
@@ -126,13 +126,17 @@ def kioskLogin(request):
     search_student = Student.objects.all().filter(student_id=entered_id)
     search_student = None if len(search_student) == 0 else search_student[0]
 
+    autoflag = False
+
     Transaction.objects.create(kiosk_id=kiosk, student=search_student, entered_id=entered_id,
-                               timestamp=datetime.now(tz=timezone.utc), morning_mode=IN_MORNING_MODE, flag=False)
+                               timestamp=datetime.now(tz=timezone.utc), morning_mode=IN_MORNING_MODE, flag=autoflag)
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
         'kiosk_id': kiosk,
         'student': model_to_dict(search_student) if search_student is not None else None,
         'entered_id': entered_id,
+        'morning_mode': IN_MORNING_MODE,
+        'flag': autoflag
     }})
 
     if search_student is not None:
@@ -149,7 +153,7 @@ def revertStudent(request):
     student_primary_key = int(request.GET.get('id', None))
     revision_revert = int(request.GET.get('revert', None))
     s = Student.objects.all().get(pk=student_primary_key)
-    num_entries =  len(Student.objects.all().get(pk=student_primary_key).history.all()) 
+    num_entries =  len(Student.objects.all().get(pk=student_primary_key).history.all())
     print(num_entries)
     if num_entries > revision_revert:
         for i in range(revision_revert+1):
