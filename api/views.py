@@ -126,22 +126,25 @@ def kioskLogin(request):
     search_student = Student.objects.all().filter(student_id=entered_id)
     search_student = None if len(search_student) == 0 else search_student[0]
 
-    autoflag = False
+    automorningmode = datetime.now().hour == 7 and datetime.now().minute > 45
+    gen_morning = IN_MORNING_MODE or automorningmode
+
+    autoflag = True if search_student.privilege_granted == 0 and gen_morning == False else False
 
     Transaction.objects.create(kiosk_id=kiosk, student=search_student, entered_id=entered_id,
-                               timestamp=datetime.now(tz=timezone.utc), morning_mode=IN_MORNING_MODE, flag=autoflag)
+                               timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag)
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
         'kiosk_id': kiosk,
         'student': model_to_dict(search_student) if search_student is not None else None,
         'entered_id': entered_id,
-        'morning_mode': IN_MORNING_MODE,
+        'morning_mode': gen_morning,
         'flag': autoflag
     }})
 
     if search_student is not None:
         return JsonResponse(data={"name": search_student.name,
-                                  "accept": True if IN_MORNING_MODE else search_student.privilege_granted
+                                  "accept": True if gen_morning else search_student.privilege_granted
         })
 
     return JsonResponse(data={"name": "Invalid ID", "accept": False})
