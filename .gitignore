@@ -1,5 +1,6 @@
 .idea/
 config.json
+dump.rdb
 
 static/
 # Created by https://www.gitignore.io
