@@ -26,7 +26,11 @@ function PageNotFound() {
     )
 }
 
+const styles = theme => ({
+    root: {
 
+    }
+});
 
 class App extends Component {
     constructor(props) {
@@ -48,7 +52,7 @@ class App extends Component {
     }
     render() {
         return (
-            <React.Fragment className={this.props.classes.root}>
+            <React.Fragment>
                 <CssBaseline />
                 <Router>
                     <SideNav open={this.state.sidenavOpen} setDrawerOpen={isOpen => this.setState({...this.state, sidenavOpen: isOpen})}/>

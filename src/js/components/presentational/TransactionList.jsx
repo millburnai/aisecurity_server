@@ -49,7 +49,7 @@ function TransactionRow(props) {
             <ListItemAvatar>
                 <Avatar alt="Avatar" src={ '/static/img/' + transaction.student.pathToImage }/>
             </ListItemAvatar>
-            <ListItemText primary={ transaction.student.name }
+            <ListItemText primary={ transaction.student.name + ' #' + transaction.student.student_id }
                           secondary={ `Kiosk ${ transaction.kiosk_id } at ${ transaction.timestamp }` }/>
             { !transaction.flag ? <CheckIcon className={ classes.yes }/> : <CloseIcon className={ classes.no }/> }
         </ListItem>
@@ -85,8 +85,18 @@ class TransactionList extends Component {
             params: params
         }).then(function(transactions) {
             let history = transactions.data;
-            history.map(i=>{i.timestamp = new Date(i.timestamp)});
-            this.setState({...this.state, transactions: history});
+            history.map(i=>{
+                i.timestamp = new Date(i.timestamp);
+                if (i.student === null) {
+                    i.student = {
+                        student_id: i.entered_id,
+                        name: "[Illegal Transaction]",
+                        privilege_granted: false,
+                        pathToImage: 'bad_profile.jpg'
+                    }
+                }
+            });
+            this.setState({...this.state, transactions: history.reverse()});
         }.bind(this))
 
     }

@@ -12,6 +12,8 @@ import {green, red} from "@material-ui/core/colors";
 import {withStyles} from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import windowSize from 'react-window-size';
+import IconButton from "@material-ui/core/IconButton";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 const styles = theme => ({
     yes: {
@@ -28,7 +30,10 @@ const styles = theme => ({
         marginLeft: theme.spacing(1),
         marginRight: theme.spacing(1),
         width: 200,
-    }
+    },
+    iconButton: {
+        margin: theme.spacing(1),
+    },
 });
 
 class TransactionView extends Component {
@@ -53,7 +58,7 @@ class TransactionView extends Component {
     }
     render() {
         return (
-            <Box  p={1}>
+            <Box  p={1} display="flex" flexDirection="column">
                 <Box
 
                     display="flex"
@@ -104,6 +109,11 @@ class TransactionView extends Component {
                     {/*    </MenuItem>*/}
                     {/*</TextField>*/}
 
+                </Box>
+                <Box mx="auto" width={this.props.windowWidth * 0.9} display="flex" flexShrink={1} justifyContent="flex-end" flexDirection="row">
+                    <IconButton href="/v1/download/transactions" target="_blank">
+                        <CloudDownloadIcon/>
+                    </IconButton>
                 </Box>
                 <TransactionList width={this.props.windowWidth * 0.9} height={500} parameters={{...this.state.params}}/>
             </Box>
