@@ -25,7 +25,7 @@ SECRET_KEY = ')fpu2^4f)xlg11t4!n0b8t&jgka!8gvj2n4=0bv=ob&)ki_dqe'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -91,8 +91,10 @@ ASGI_APPLICATION = 'api.socket.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'read_default_file': '/home/kiosk/kioskv3/kioskserver/my.cnf',
+        },
     }
 }
 
