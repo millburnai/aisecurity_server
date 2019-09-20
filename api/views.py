@@ -137,11 +137,12 @@ def kioskLogin(request):
     search_student = Student.objects.all().filter(student_id=entered_id)
     search_student = None if len(search_student) == 0 else search_student[0]
 
-    automorningmode = datetime.now().hour == 7 and datetime.now().minute > 45
+    automorningmode = datetime.now().hour == 11 and datetime.now().minute > 45
     gen_morning = IN_MORNING_MODE or automorningmode
 
     autoflag = False
     if search_student is not None:
+<<<<<<< HEAD
         autoflag = search_student.privilege_granted == 0 and gen_morning == False
 
     movement = False
@@ -150,6 +151,10 @@ def kioskLogin(request):
             movement = search_student.toggleIn(date.today())
         else:
             movement = True
+=======
+        autoflag = True if search_student.privilege_granted == 0 and gen_morning == False else False
+
+>>>>>>> fb7cc916bbe91714ce5e86c7ceaf2c8e9998ac70
 
     Transaction.objects.create(kiosk_id=kiosk, student=search_student, entered_id=entered_id,
                                timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement)
@@ -166,10 +171,10 @@ def kioskLogin(request):
     if search_student is not None:
         accepted = True if gen_morning else search_student.privilege_granted
         return JsonResponse(data={"name": search_student.name,
-                                  "accept": accepted,
-								  "seniorPriv": accepted,
+                                  "accept": True if gen_morning else search_student.privilege_granted,
+				                  "seniorPriv": True if gen_morning else search_student.privilege_granted,
                                   "id": search_student.student_id,
-								  "in": search_student.getIn(date.today()),
+				                  "in": 0,
         })
 
     return JsonResponse(data={"name": "Invalid ID", "accept": False, "id": 00000, "seniorPriv": 0, "in": 0})
