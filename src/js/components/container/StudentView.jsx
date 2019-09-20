@@ -11,7 +11,10 @@ import CloseIcon from "@material-ui/icons/Close";
 import {green, red} from "@material-ui/core/colors";
 import {withStyles} from "@material-ui/core/styles";
 import PropTypes from "prop-types";
+import windowSize from 'react-window-size';
 import StudentDialog from "../presentational/StudentDialog.jsx";
+import IconButton from "@material-ui/core/IconButton";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 const styles = theme => ({
     yes: {
@@ -64,7 +67,7 @@ class StudentView extends Component {
     }
     render() {
         return (
-            <Box  p={1}>
+            <Box  p={1} display="flex" flexDirection="column">
                 <Box
 
                     display="flex"
@@ -116,8 +119,13 @@ class StudentView extends Component {
                     </TextField>
 
                 </Box>
+                <Box mx="auto" width={this.props.windowWidth * 0.6} display="flex" flexShrink={1} justifyContent="flex-end" flexDirection="row">
+                    <IconButton href="/v1/download/students" target="_blank">
+                        <CloudDownloadIcon/>
+                    </IconButton>
+                </Box>
                 {/*<StudentDialog onClose={()=>{}} open={true}/>*/}
-                <StudentList parameters={{...this.state.params}}/>
+                <StudentList height={500} width={this.props.windowWidth * 0.6} parameters={{...this.state.params}}/>
             </Box>
         );
     }
@@ -125,6 +133,8 @@ class StudentView extends Component {
 
 StudentView.propTypes = {
     classes: PropTypes.object.isRequired,
+    windowHeight: PropTypes.number.isRequired,
+    windowWidth: PropTypes.number.isRequired,
 };
 
-export default withStyles(styles)(StudentView);
+export default windowSize(withStyles(styles)(StudentView));

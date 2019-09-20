@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
-import { FixedSizeList } from "react-window";
+import {FixedSizeList} from "react-window";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import PropTypes from "prop-types";
-import windowSize from 'react-window-size';
 import {withStyles} from "@material-ui/core/styles";
 import {Switch} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
@@ -39,88 +38,101 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function StudentRow(props) {
-    const { index, style, studentList } = props;
-    const currentStudent = studentList[index];
-    console.log(currentStudent);
+function MorningRow(props) {
+    const {index, style, tardyList} = props;
+    const transaction = tardyList[index];
+    // console.log(transaction);
     const classes = useStyles();
+    let [student, setStudent] = React.useState();
     return (
-        <ListItem style={style} key={index}>
+        <ListItem style={ style } key={ index }>
             <ListItemAvatar>
-                <Avatar alt="Avatar" src={'/static/img/' + currentStudent.pathToImage}/>
+                <Avatar alt="Avatar" src={ '/static/img/' + transaction.student.pathToImage }/>
             </ListItemAvatar>
-            <ListItemText primary={currentStudent.name} secondary={`${currentStudent.student_id} • Grade ${currentStudent.grade}`}/>
-            {currentStudent.privilege_granted ? <CheckIcon className={classes.yes}/> : <CloseIcon className={classes.no}/>}
-            <IconButton>
-                <InfoIcon/>
-            </IconButton>
+            <ListItemText primary={ transaction.student.name + ' #' + transaction.student.student_id }
+                          secondary={ `Kiosk ${ transaction.kiosk_id } at ${ transaction.timestamp }` }/>
+            { !transaction.flag ? <CheckIcon className={ classes.yes }/> : <CloseIcon className={ classes.no }/> }
         </ListItem>
     )
 }
 
-StudentRow.propTypes = {
+MorningRow.propTypes = {
     index: PropTypes.number.isRequired,
     style: PropTypes.object.isRequired,
-    studentList: PropTypes.array.isRequired,
+    tardyList: PropTypes.array.isRequired,
 };
 
-class StudentList extends Component {
+class MorningList extends Component {
     constructor(props) {
         super(props);
         this.classes = this.props.classes;
         this.state = {
-            students: [],
+            tardies: [],
         };
     }
 
-    getStudents() {
+    getTardies() {
         let params = {...this.props.parameters};
         for (let key in params) {
             if (params[key] === undefined || params[key] === null || params[key] === '') {
                 delete params[key];
             }
         }
-        axios.get("/v1/students", {
+        axios.get('/v1/transactions', {
             headers: {
                 'Authorization': 'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token,
             },
-            params: params
+            params: {
+                ...params,
+                morning_mode: 1,
+            }
+        }).then(function(tardies) {
+            let history = tardies.data;
+            history.map(i=>{
+                i.timestamp = new Date(i.timestamp);
+                if (i.student === null) {
+                    i.student = {
+                        student_id: i.entered_id,
+                        name: "[Illegal Transaction]",
+                        privilege_granted: false,
+                        pathToImage: 'bad_profile.jpg'
+                    }
+                }
+            });
+            this.setState({...this.state, tardies: history.reverse()});
+        }.bind(this))
 
-        }).then(download=>{
-            // console.log(download);
-            const studentList = download.data;
-            this.setState({...this.state, students: studentList});
-        })
     }
 
     componentDidMount() {
-        this.getStudents();
+        this.getTardies();
     }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (!(prevProps.parameters && this.props.parameters && isEqual(prevProps.parameters, this.props.parameters)))
-            this.getStudents();
+            this.getTardies();
     }
 
     render() {
         return (
             <FixedSizeList
-                className={this.classes.list}
-                height={this.props.height}
-                itemCount={this.state.students.length}
-                itemSize={60}
-                width={this.props.width}
+                className={ this.classes.list }
+                height={ this.props.height }
+                itemCount={ this.state.tardies.length }
+                itemSize={ 60 }
+                width={ this.props.width }
             >
-                { props => <StudentRow {...props} studentList={this.state.students}/> }
+                { props => <MorningRow { ...props } tardyList={ this.state.tardies }/> }
             </FixedSizeList>
         );
     }
 }
 
-StudentList.propTypes = {
+MorningList.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     classes: PropTypes.object.isRequired,
     parameters: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(StudentList);
+export default withStyles(styles)(MorningList);

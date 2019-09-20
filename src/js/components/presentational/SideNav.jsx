@@ -58,10 +58,12 @@ function SideNav(props) {
                                 <ListItemText primary="History"/>
                             </ListItem>
                         </Link>
-                        <ListItem button key="Tardies">
-                            <ListItemIcon><HourglassEmptyIcon/></ListItemIcon>
-                            <ListItemText primary="Tardies"/>
-                        </ListItem>
+                        <Link to="/tardies" className={classes.link}>
+                            <ListItem button key="Tardies">
+                                <ListItemIcon><HourglassEmptyIcon/></ListItemIcon>
+                                <ListItemText primary="Tardies"/>
+                            </ListItem>
+                        </Link>
                         <Link to="/students" className={classes.link}>
                             <ListItem button key="Students">
                                 <ListItemIcon><PeopleIcon/></ListItemIcon>

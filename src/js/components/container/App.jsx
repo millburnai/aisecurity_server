@@ -16,6 +16,7 @@ import LoginView from "./LoginView.jsx";
 import HomeView from "./HomeView.jsx";
 import TransactionView from "./TransactionView.jsx";
 import withStyles from "@material-ui/core/styles/withStyles";
+import MorningView from "./MorningView.jsx";
 
 
 function PageNotFound() {
@@ -66,6 +67,7 @@ class App extends Component {
                                     <Route exact path="/login" component={LoginView}/>
                                     <PrivateRoute exact path="/students" component={StudentView}/>
                                     <PrivateRoute exact path="/history" component={TransactionView}/>
+                                    <PrivateRoute exact path="/tardies" component={MorningView}/>
                                     <Route component={PageNotFound}/>
                                 </Switch>
                             </div>
