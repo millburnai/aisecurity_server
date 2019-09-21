@@ -24,16 +24,18 @@ router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'students', views.StudentViewSet, basename="Student")
 router.register(r'transactions', views.TransactionViewSet)
+router.register(r'studentinout', views.StudentDateInOutStatusViewSet)
 
 urlpatterns = [
     url(r'^v1/', include(router.urls)),
     path('v1/students/revert', views.revertStudent),
+    path('v1/students/strikes', views.getStrikes),
     path('v1/download/students', views.downloadStudent),
     path('v1/download/transactions', views.downloadTransaction),
     path('v1/morning', views.getMorningMode),
     path('v1/morning/set', views.setMorningMode),
     path('v1/admin/', admin.site.urls),
-    path('v1/kiosks/login', views.kioskLogin),
+    path('kiosk/login', views.kioskLogin),
     path('', views.IndexWebApp),
     path('students', views.IndexWebApp),
     path('history', views.IndexWebApp),

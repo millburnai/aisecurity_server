@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import Student, Transaction
+from .models import Student, Transaction, StudentDateInOutStatus
 from django.contrib.auth.models import User, Group
-from .serializers import UserSerializer, GroupSerializer, StudentSerializer, TransactionSerializer
+from .serializers import UserSerializer, GroupSerializer, StudentSerializer, TransactionSerializer, StudentDateInOutStatusSerializer
 from django.contrib.auth import get_user_model
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from django.http import JsonResponse, HttpResponse
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -29,59 +29,68 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
+class StudentDateInOutStatusViewSet(viewsets.ModelViewSet):
+        queryset = StudentDateInOutStatus.objects.all()
+        serializer_class = StudentDateInOutStatusSerializer
+
+def getTransactionSet(request):
+    queryset = Transaction.objects.all()
+    kiosk_id = request.query_params.get('kiosk_id', None)
+    if kiosk_id is not None:
+        queryset = queryset.filter(kiosk_id=kiosk_id)
+    entered_id = request.query_params.get('entered_id', None)
+    if entered_id is not None:
+        queryset = queryset.filter(entered_id=entered_id)
+    from_datetime = request.query_params.get('from_datetime', None)
+    if from_datetime is not None:
+        queryset = queryset.filter(timestamp__gte=from_datetime)
+    to_datetime = request.query_params.get('to_datetime', None)
+    if to_datetime is not None:
+        queryset = queryset.filter(timestamp__lte=to_datetime)
+    student_id = request.query_params.get('student_id', None)
+    if student_id is not None:
+        queryset = queryset.filter(student__student_id=student_id)
+    student_name = request.query_params.get('student_name', None)
+    if student_name is not None:
+        queryset = queryset.filter(student__name__contains=student_name)
+    morning = request.query_params.get('morning_mode', None)
+    if morning is not None:
+        queryset = queryset.filter(morning=morning)
+    flag = request.query_params.get('flag', None)
+    if flag is not None:
+        queryset = queryset.filter(flag=flag)
+
+    return queryset
+
+def getStudentSet(request):
+    queryset = Student.objects.all()
+    name = request.query_params.get('name', None)
+    if name is not None:
+        queryset = queryset.filter(name__contains=name)
+    grade = request.query_params.get('grade', None)
+    if grade is not None:
+        queryset = queryset.filter(grade=grade)
+    student_id = request.query_params.get('student_id', None)
+    if student_id is not None:
+        queryset = queryset.filter(student_id__contains=student_id)
+    privilege_granted = request.query_params.get('privilege_granted', None)
+    if privilege_granted is not None:
+        queryset = queryset.filter(privilege_granted=privilege_granted)
+    return queryset
+
 
 class StudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
-
     def get_queryset(self):
-        queryset = Student.objects.all()
-        name = self.request.query_params.get('name', None)
-        if name is not None:
-            queryset = queryset.filter(name__contains=name)
-        grade = self.request.query_params.get('grade', None)
-        if grade is not None:
-            queryset = queryset.filter(grade=grade)
-        student_id = self.request.query_params.get('student_id', None)
-        if student_id is not None:
-            queryset = queryset.filter(student_id__contains=student_id)
-        privilege_granted = self.request.query_params.get('privilege_granted', None)
-        if privilege_granted is not None:
-            queryset = queryset.filter(privilege_granted=privilege_granted)
-        return queryset
+        return getStudentSet(self.request)
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-
     def get_queryset(self):
-        queryset = Transaction.objects.all()
-        kiosk_id = self.request.query_params.get('kiosk_id', None)
-        if kiosk_id is not None:
-            queryset = queryset.filter(kiosk_id=kiosk_id)
-
-        entered_id = self.request.query_params.get('entered_id', None)
-        if entered_id is not None:
-            queryset = queryset.filter(entered_id=entered_id)
-
-        from_datetime = self.request.query_params.get('from_datetime', None)
-        if from_datetime is not None:
-            queryset = queryset.filter(timestamp__gte=from_datetime)
-
-        to_datetime = self.request.query_params.get('to_datetime', None)
-        if to_datetime is not None:
-            queryset = queryset.filter(timestamp__lte=to_datetime)
-
-        student_id = self.request.query_params.get('student_id', None)
-        if student_id is not None:
-            queryset = queryset.filter(student__student_id=student_id)
-
-        student_name = self.request.query_params.get('student_name', None)
-        if student_name is not None:
-            queryset = queryset.filter(student__name__contains=student_name)
-
-        return queryset
+        return getTransactionSet(self.request)
 
 def downloadStudent(request):
     response = HttpResponse(content_type='text/csv')
@@ -102,15 +111,17 @@ def downloadTransaction(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="transaction_download.csv"'
     writer = csv.writer(response)
-    writer.writerow(['internal_id', 'entered_id', 'student_name', 'student_id', 'timestamp', 'flagged'])
-    for transaction in Transaction.objects.all():
+    writer.writerow(['internal_id', 'entered_id', 'student_name', 'student_id', 'timestamp', 'morning', 'movement', 'flagged'])
+    for transaction in getTransactionSet(self.request):
         writer.writerow([
             transaction.pk,
             transaction.entered_id,
             transaction.student.name if transaction.student is not None else "N/A",
             transaction.student.student_id if transaction.student is not None else "N/A",
             transaction.timestamp,
-            transaction.flag
+            transaction.morning_mode,
+            transaction.movement,
+            transaction.flag,
         ])
     return response
 
@@ -126,13 +137,28 @@ def kioskLogin(request):
     search_student = Student.objects.all().filter(student_id=entered_id)
     search_student = None if len(search_student) == 0 else search_student[0]
 
-    automorningmode = datetime.now().hour == 7 and datetime.now().minute > 45
+    automorningmode = datetime.now().hour == 11 and datetime.now().minute > 45
     gen_morning = IN_MORNING_MODE or automorningmode
 
-    autoflag = True if search_student.privilege_granted == 0 and gen_morning == False else False
+    autoflag = False
+    if search_student is not None:
+<<<<<<< HEAD
+        autoflag = search_student.privilege_granted == 0 and gen_morning == False
+
+    movement = False
+    if search_student is not None and search_student.privilege_granted:
+        if not gen_morning:
+            movement = search_student.toggleIn(date.today())
+        else:
+            movement = True
+=======
+        autoflag = True if search_student.privilege_granted == 0 and gen_morning == False else False
+
+>>>>>>> fb7cc916bbe91714ce5e86c7ceaf2c8e9998ac70
 
     Transaction.objects.create(kiosk_id=kiosk, student=search_student, entered_id=entered_id,
-                               timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag)
+                               timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement)
+
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
         'kiosk_id': kiosk,
@@ -143,11 +169,15 @@ def kioskLogin(request):
     }})
 
     if search_student is not None:
+        accepted = True if gen_morning else search_student.privilege_granted
         return JsonResponse(data={"name": search_student.name,
-                                  "accept": True if gen_morning else search_student.privilege_granted
+                                  "accept": True if gen_morning else search_student.privilege_granted,
+				                  "seniorPriv": True if gen_morning else search_student.privilege_granted,
+                                  "id": search_student.student_id,
+				                  "in": 0,
         })
 
-    return JsonResponse(data={"name": "Invalid ID", "accept": False})
+    return JsonResponse(data={"name": "Invalid ID", "accept": False, "id": 00000, "seniorPriv": 0, "in": 0})
 
 def revertStudent(request):
     def fix(val, current):
@@ -170,6 +200,22 @@ def revertStudent(request):
             s.pathToImage = fix(n.get("pathToImage", None), s.pathToImage)
     s.save()
     return JsonResponse(data={})
+
+def getStrikes(request):
+    data = []
+    for student in Student.objects.all():
+        d = {}
+        d['student_id'] = str(student.student_id)
+        d['strikes'] = []
+        d['num_strikes'] = 0
+        for state in student.end_states.all():
+            if state.status == False:
+                d['strikes'].append(model_to_dict(state))
+                d['num_strikes'] += 1
+        data.append(d)
+    return JsonResponse(data=data, safe=False)
+
+
 
 
 def getMorningMode(request):
