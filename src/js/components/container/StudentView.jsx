@@ -15,6 +15,7 @@ import windowSize from 'react-window-size';
 import StudentDialog from "../presentational/StudentDialog.jsx";
 import IconButton from "@material-ui/core/IconButton";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+import isEqual from "lodash.isequal";
 
 const styles = theme => ({
     yes: {
@@ -49,6 +50,8 @@ class StudentView extends Component {
                 grade: '',
                 sort: '',
             },
+            selectedStudent: null,
+            students: [],
         };
         this.handleChange = name => event => {
             // this.parameters[name] = event.target.value;
@@ -61,10 +64,49 @@ class StudentView extends Component {
                 }
             });
         };
+        this.setStudentDialog = (student) => {
+            this.setState((state, props) => {
+                return {
+                    selectedStudent: student === undefined ? null : student,
+                }
+            });
+        };
+        this.closeStudentDialog = () => {
+            this.setStudentDialog(null);
+        };
+        this.getStudents = this.getStudents.bind(this);
     }
+    getStudents() {
+        let params = {...this.state.params};
+        for (let key in params) {
+            if (params[key] === undefined || params[key] === null || params[key] === '') {
+                delete params[key];
+            }
+        }
+        axios.get("/v1/students", {
+            headers: {
+                'Authorization': 'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token,
+            },
+            params: params
+
+        }).then(download=>{
+            // console.log(download);
+            const studentList = download.data;
+            this.setState({...this.state, students: studentList});
+        })
+    }
+
     componentDidMount() {
-        // axios.get('/v1/students').then(data=>this.setState({...this.state, data: data}));
+        this.getStudents();
     }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log(prevState.params, this.state.params, isEqual(prevState.params, this.state.params));
+        if (!(prevState.params && this.state.params && isEqual(prevState.params, this.state.params))) {
+            // console.log('eeeee');
+            this.getStudents();
+        }
+    }
+
     render() {
         return (
             <Box  p={1} display="flex" flexDirection="column">
@@ -124,8 +166,8 @@ class StudentView extends Component {
                         <CloudDownloadIcon/>
                     </IconButton>
                 </Box>
-                {/*<StudentDialog onClose={()=>{}} open={true}/>*/}
-                <StudentList height={500} width={this.props.windowWidth * 0.6} parameters={{...this.state.params}}/>
+                <StudentDialog onsave={this.getStudents} onClose={this.closeStudentDialog} open={this.state.selectedStudent !== null} student={this.state.selectedStudent}/>
+                <StudentList height={500} setStudentDialog={this.setStudentDialog} width={this.props.windowWidth * 0.6} students={this.state.students}/>
             </Box>
         );
     }

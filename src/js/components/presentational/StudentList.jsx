@@ -44,6 +44,9 @@ function StudentRow(props) {
     const currentStudent = studentList[index];
     console.log(currentStudent);
     const classes = useStyles();
+    function showStudentDialog() {
+        props.setStudentDialog(studentList[index]);
+    }
     return (
         <ListItem style={style} key={index}>
             <ListItemAvatar>
@@ -51,7 +54,7 @@ function StudentRow(props) {
             </ListItemAvatar>
             <ListItemText primary={currentStudent.name} secondary={`${currentStudent.student_id} • Grade ${currentStudent.grade}`}/>
             {currentStudent.privilege_granted ? <CheckIcon className={classes.yes}/> : <CloseIcon className={classes.no}/>}
-            <IconButton>
+            <IconButton onClick={showStudentDialog}>
                 <InfoIcon/>
             </IconButton>
         </ListItem>
@@ -62,6 +65,7 @@ StudentRow.propTypes = {
     index: PropTypes.number.isRequired,
     style: PropTypes.object.isRequired,
     studentList: PropTypes.array.isRequired,
+    setStudentDialog: PropTypes.func.isRequired,
 };
 
 class StudentList extends Component {
@@ -69,36 +73,7 @@ class StudentList extends Component {
         super(props);
         this.classes = this.props.classes;
         this.state = {
-            students: [],
         };
-    }
-
-    getStudents() {
-        let params = {...this.props.parameters};
-        for (let key in params) {
-            if (params[key] === undefined || params[key] === null || params[key] === '') {
-                delete params[key];
-            }
-        }
-        axios.get("/v1/students", {
-            headers: {
-                'Authorization': 'Bearer ' + window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token,
-            },
-            params: params
-
-        }).then(download=>{
-            // console.log(download);
-            const studentList = download.data;
-            this.setState({...this.state, students: studentList});
-        })
-    }
-
-    componentDidMount() {
-        this.getStudents();
-    }
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (!(prevProps.parameters && this.props.parameters && isEqual(prevProps.parameters, this.props.parameters)))
-            this.getStudents();
     }
 
     render() {
@@ -106,11 +81,11 @@ class StudentList extends Component {
             <FixedSizeList
                 className={this.classes.list}
                 height={this.props.height}
-                itemCount={this.state.students.length}
+                itemCount={this.props.students.length}
                 itemSize={60}
                 width={this.props.width}
             >
-                { props => <StudentRow {...props} studentList={this.state.students}/> }
+                { props => <StudentRow {...props} setStudentDialog={this.props.setStudentDialog} studentList={this.props.students}/> }
             </FixedSizeList>
         );
     }
@@ -120,7 +95,8 @@ StudentList.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     classes: PropTypes.object.isRequired,
-    parameters: PropTypes.object.isRequired,
+    setStudentDialog: PropTypes.func.isRequired,
+    students: PropTypes.array.isRequired,
 };
 
 export default withStyles(styles)(StudentList);

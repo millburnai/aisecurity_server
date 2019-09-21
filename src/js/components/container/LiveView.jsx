@@ -17,6 +17,7 @@ import IconButton from "@material-ui/core/IconButton";
 import {red} from "@material-ui/core/colors";
 import clsx from "clsx";
 import axios from 'axios';
+import StudentDialog from "../presentational/StudentDialog.jsx";
 
 const LiveCard = (props) => {
     const [data, setData] = useState(props.data);
@@ -59,7 +60,7 @@ const LiveCard = (props) => {
                 title={data.student.name}
                 subheader={data.student.student_id}
                 action={
-                    <IconButton>
+                    <IconButton onClick={()=>props.setStudentDialog(data.student)}>
                         <InfoIcon/>
                     </IconButton>
                 }
@@ -78,7 +79,7 @@ const LiveCard = (props) => {
 const LiveFeed = (props) => {
     return (
         <Box>
-            {props.feed.map(item=><LiveCard key={item.idx} data={item} />)}
+            {props.feed.map(item=><LiveCard key={item.idx} data={item} {...props} />)}
         </Box>
     );
 };
@@ -99,8 +100,19 @@ class LiveView extends Component {
         this.state = {
             data: [...new Array(6)].map(i=>[]),
             active: [true, true, true, true, true, true],
+            selectedStudent: null,
         };
         this.uniqueKey = 0;
+        this.setStudentDialog = (student) => {
+            this.setState((state, props) => {
+                return {
+                    selectedStudent: student === undefined ? null : student,
+                }
+            });
+        };
+        this.closeStudentDialog = () => {
+            this.setStudentDialog(null);
+        };
     }
     componentDidMount() {
         this.socket = new WebSocket('ws://' + window.location.host + '/v1/guard/live');
@@ -124,6 +136,7 @@ class LiveView extends Component {
 
     render() {
         return (
+            <React.Fragment>
             <Box className={this.classes.container} display="flex" flexDirection="row">
                 {
                     this.state.active
@@ -131,11 +144,13 @@ class LiveView extends Component {
                         .filter(i=>i!==false) //filter out inactive, leaving an array of kiosk ids
                         .map(i =>
                             <Box className={ this.classes.feed } key={i} flexGrow={ 1 }>
-                                <LiveFeed kiosk={i} feed={this.state.data[i]}/>
+                                <LiveFeed setStudentDialog={this.setStudentDialog} kiosk={i} feed={this.state.data[i]}/>
                             </Box>
                         )
                 }
             </Box>
+            <StudentDialog  onClose={this.closeStudentDialog} open={this.state.selectedStudent !== null} student={this.state.selectedStudent}/>
+            </React.Fragment>
         );
     }
     componentWillUnmount() {
