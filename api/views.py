@@ -142,7 +142,7 @@ def kioskLogin(request):
 
     autoflag = False
     if search_student is not None:
-<<<<<<< HEAD
+#<<<<<<< HEAD
         autoflag = search_student.privilege_granted == 0 and gen_morning == False
 
     movement = False
@@ -151,11 +151,12 @@ def kioskLogin(request):
             movement = search_student.toggleIn(date.today())
         else:
             movement = True
+'''
 =======
         autoflag = True if search_student.privilege_granted == 0 and gen_morning == False else False
 
 >>>>>>> fb7cc916bbe91714ce5e86c7ceaf2c8e9998ac70
-
+'''
     Transaction.objects.create(kiosk_id=kiosk, student=search_student, entered_id=entered_id,
                                timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement)
 
