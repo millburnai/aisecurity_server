@@ -142,7 +142,6 @@ def kioskLogin(request):
 
     autoflag = False
     if search_student is not None:
-#<<<<<<< HEAD
         autoflag = search_student.privilege_granted == 0 and gen_morning == False
 
     movement = False
@@ -151,19 +150,15 @@ def kioskLogin(request):
             movement = search_student.toggleIn(date.today())
         else:
             movement = True
-'''
-=======
-        autoflag = True if search_student.privilege_granted == 0 and gen_morning == False else False
 
->>>>>>> fb7cc916bbe91714ce5e86c7ceaf2c8e9998ac70
-'''
-    Transaction.objects.create(kiosk_id=kiosk, student=search_student, entered_id=entered_id,
-                               timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement)
+    Transaction.objects.create(kiosk_id=kiosk,student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement)
+
+    print(autoflag)
 
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
         'kiosk_id': kiosk,
-        'student': model_to_dict(search_student) if search_student is not None else None,
+        'student': search_student.clean() if search_student is not None else None,
         'entered_id': entered_id,
         'morning_mode': gen_morning,
         'flag': autoflag
@@ -173,9 +168,9 @@ def kioskLogin(request):
         accepted = True if gen_morning else search_student.privilege_granted
         return JsonResponse(data={"name": search_student.name,
                                   "accept": True if gen_morning else search_student.privilege_granted,
-				                  "seniorPriv": True if gen_morning else search_student.privilege_granted,
+				  "seniorPriv": True if gen_morning else search_student.privilege_granted,
                                   "id": search_student.student_id,
-				                  "in": 0,
+				  "in": 0,
         })
 
     return JsonResponse(data={"name": "Invalid ID", "accept": False, "id": 00000, "seniorPriv": 0, "in": 0})

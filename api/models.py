@@ -24,6 +24,9 @@ class Student(models.Model):
 
 	def __str__(self):
 		return "Student: " + self.name
+	
+	def clean(self):
+		return {"name": self.name, "student_id": self.student_id, "grade": self.grade, "privilege_granted": self.privilege_granted}
 
 	def toggleIn(self, date_lookup):
 		records = self.end_states.all().filter(date=date_lookup)
