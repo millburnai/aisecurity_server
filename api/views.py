@@ -153,8 +153,6 @@ def kioskLogin(request):
 
     Transaction.objects.create(kiosk_id=kiosk,student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement)
 
-    print(autoflag)
-
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
         'kiosk_id': kiosk,
