@@ -1,7 +1,7 @@
 import csv
 import api.models
 
-with open("/home/kiosk/Downloads/Kiosk Data 19-20 - Sheet1.csv") as csv_file:
+with open("/home/alexweiss/Downloads/Kiosk Data 19-20 - Sheet1.csv") as csv_file:
 	reader = csv.reader(csv_file)
 	i = 0
 	for row in reader:

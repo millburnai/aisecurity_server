@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
 
 class StudentDateInOutStatus(models.Model):
 	date = models.DateField()
-	status = models.BooleanField()
+	in_school = models.BooleanField()
 	resolved = models.BooleanField(default=False)
 
 class Student(models.Model):
@@ -32,14 +32,14 @@ class Student(models.Model):
 		records = self.end_states.all().filter(date=date_lookup)
 		print(len(records))
 		if len(records) == 0:
-			p = StudentDateInOutStatus(date = date_lookup, status=False)
+			p = StudentDateInOutStatus(date=date_lookup, in_school=False)
 			p.save()
 			self.end_states.add(p)
 			return False
 		elif len(records) == 1:
-			records[0].status = not records[0].status
+			records[0].in_school = not records[0].in_school
 			records[0].save()
-			return records[0].status
+			return records[0].in_school
 		else:
 			print("THIS IS VERY BAD")
 			return False
@@ -47,12 +47,12 @@ class Student(models.Model):
 	def getIn(self, date_lookup):
 		records = self.end_states.all().filter(date=date_lookup)
 		if len(records) == 0:
-			p = StudentDateInOutStatus(date = date_lookup, status=True)
+			p = StudentDateInOutStatus(date=date_lookup, in_school=True)
 			p.save()
 			self.end_states.add(p)
 			return False
 		elif len(records) == 1:
-			return records[0].status
+			return records[0].in_school
 		else:
 			print("THIS IS VERY BAD")
 			return False

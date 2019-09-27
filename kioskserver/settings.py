@@ -93,7 +93,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
-            'read_default_file': '/home/kiosk/kioskv3/kioskserver/my.cnf',
+            'read_default_file': '/home/alexweiss/projects/kioskv3/kioskserver/my.cnf',
         },
     }
 }

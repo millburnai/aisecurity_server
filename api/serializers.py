@@ -17,7 +17,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class StudentDateInOutStatusSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = StudentDateInOutStatus
-        fields = ['date', 'status', 'resolved']
+        fields = ['date', 'in_school', 'resolved']
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
