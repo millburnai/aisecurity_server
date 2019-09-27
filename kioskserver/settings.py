@@ -89,11 +89,12 @@ ASGI_APPLICATION = 'api.socket.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+database_config = os.environ['DATABASE_CONFIG'] if 'DATABASE_CONFIG' in os.environ else '/home/kiosk/kioskv3/kioskserver/my.cnf'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
-            'read_default_file': '/home/alexweiss/projects/kioskv3/kioskserver/my.cnf',
+            'read_default_file': database_config,
         },
     }
 }

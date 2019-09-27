@@ -37,7 +37,8 @@
     "start": "webpack-dev-server --open --mode development",
     "build:prod": "webpack --mode=production",
     "build:dev": "webpack --mode=development",
-    "serve": "redis-server & python3 manage.py runserver 0.0.0.0:8000"
+    "serve": "redis-server & python3 manage.py runserver 0.0.0.0:8000",
+    "migrate": "python3 manage.py migrate"
   },
   "dependencies": {}
 }
