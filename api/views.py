@@ -58,7 +58,7 @@ def getTransactionSet(request):
         queryset = queryset.filter(student__name__contains=student_name)
     morning = request.GET.get('morning_mode', None)
     if morning is not None:
-        queryset = queryset.filter(morning=morning)
+        queryset = queryset.filter(morning_mode=morning)
     flag = request.GET.get('flag', None)
     if flag is not None:
         queryset = queryset.filter(flag=flag)
