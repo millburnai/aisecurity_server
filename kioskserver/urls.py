@@ -39,5 +39,6 @@ urlpatterns = [
     path('', views.IndexWebApp),
     path('students', views.IndexWebApp),
     path('history', views.IndexWebApp),
-    path('live', views.IndexWebApp)
+    path('live', views.IndexWebApp),
+    path('tardies', views.IndexWebApp),
 ]

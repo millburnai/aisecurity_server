@@ -13,7 +13,7 @@ import PropTypes from "prop-types";
 import windowSize from 'react-window-size';
 import IconButton from "@material-ui/core/IconButton";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
-import MorningList from "../presentational/MorningList.jsx";
+import TransactionList from "../presentational/TransactionList.jsx";
 
 const styles = theme => ({
     yes: {
@@ -111,11 +111,11 @@ class MorningView extends Component {
 
                 </Box>
                 <Box mx="auto" width={this.props.windowWidth * 0.9} display="flex" flexShrink={1} justifyContent="flex-end" flexDirection="row">
-                    <IconButton href="/v1/download/morning" target="_blank">
+                    <IconButton href="/v1/download/transactions?morning_mode=1" target="_blank">
                         <CloudDownloadIcon/>
                     </IconButton>
                 </Box>
-                <MorningList width={this.props.windowWidth * 0.9} height={500} parameters={{...this.state.params}}/>
+                <TransactionList width={this.props.windowWidth * 0.9} height={500} parameters={{...this.state.params, morning_mode: 1}}/>
             </Box>
         );
     }

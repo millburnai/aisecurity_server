@@ -13,6 +13,9 @@ import Button from "@material-ui/core/Button";
 import FlagIcon from "@material-ui/icons/Flag";
 import InfoIcon from "@material-ui/icons/Info";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
+import MeetingRoomIcon from "@material-ui/icons/MeetingRoom";
+import AlarmIcon from "@material-ui/icons/Alarm";
 import IconButton from "@material-ui/core/IconButton";
 import {red} from "@material-ui/core/colors";
 import clsx from "clsx";
@@ -24,7 +27,9 @@ const LiveCard = (props) => {
     const handleFlag = () => {
         const newFlagState = !data.flag;
         //how tf do i flag??
-        //axios.post('/v1/transactions/')
+        axios.patch(`/v1/transactions/${data.id}/`, {
+            flag: newFlagState
+        });
         setData({...data, flag: newFlagState});
     };
     const useStyles = makeStyles(theme => ({
@@ -34,7 +39,23 @@ const LiveCard = (props) => {
         },
         flaggedCard: { //listen i know this is ugly af don't judge me, i just want to finish this damn project
             color: theme.palette.getContrastText(red[500]),
-            backgroundColor: red[600]
+            backgroundColor: red[600],
+            "& $cardTitle, & $cardSubheader": {
+                color: theme.palette.getContrastText(red[500]),
+            },
+            "& $cardInfoButton": {
+                color: theme.palette.getContrastText(red[500]),
+                opacity: 0.8, //nobody will notice, right?
+            }
+        },
+        cardTitle: {
+
+        },
+        cardSubheader: {
+
+        },
+        cardInfoButton: {
+
         },
         flaggableButton: {
             color: theme.palette.getContrastText(red[500]),
@@ -57,16 +78,24 @@ const LiveCard = (props) => {
     return (
         <Card className={clsx(classes.card, {[classes.flaggedCard]: data.flag})}>
             <CardHeader
+                classes={{
+                    title: classes.cardTitle,
+                    subheader: classes.cardSubheader,
+                }}
                 title={data.student.name}
                 subheader={data.student.student_id}
                 action={
-                    <IconButton onClick={()=>props.setStudentDialog(data.student)}>
+                    <IconButton className={classes.cardInfoButton} onClick={()=>props.setStudentDialog(data.student)}>
                         <InfoIcon/>
                     </IconButton>
                 }
             />
             <CardMedia image={"/static/img/" + data.student.pathToImage} className={classes.profile} />
             <CardActions>
+                {data.morning_mode ? <AlarmIcon/> : (data.entering ? <React.Fragment><DoubleArrowIcon/><MeetingRoomIcon/></React.Fragment> : <React.Fragment><MeetingRoomIcon/><DoubleArrowIcon/></React.Fragment>)}
+                <span>
+                    {data.morning_mode ? "Tardy" : (data.entering ? "Entering" : "Exiting")}
+                </span>
                 <Button onClick={handleFlag} variant="contained" className={clsx(classes.secondaryAction,{[classes.flaggableButton]: !data.flag})}>
                     {!data.flag ? "Flag" : "Unflag"}
                     {!data.flag ? <FlagIcon className={classes.rightIcon}/> : <ThumbUpIcon className={classes.rightIcon}/>}

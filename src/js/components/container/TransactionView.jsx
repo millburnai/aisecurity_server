@@ -115,7 +115,7 @@ class TransactionView extends Component {
                         <CloudDownloadIcon/>
                     </IconButton>
                 </Box>
-                <TransactionList width={this.props.windowWidth * 0.9} height={500} parameters={{...this.state.params}}/>
+                <TransactionList width={this.props.windowWidth * 0.9} height={500} parameters={{...this.state.params, morning_mode: 0}}/>
             </Box>
         );
     }

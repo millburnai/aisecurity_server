@@ -11,6 +11,9 @@ import {makeStyles} from "@material-ui/core/styles";
 import shadows from "@material-ui/core/styles/shadows";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
+import DoubleArrowOutlinedIcon from "@material-ui/icons/DoubleArrowOutlined";
+import MeetingRoomOutlinedIcon from "@material-ui/icons/MeetingRoomOutlined";
+import AlarmOutlinedIcon from "@material-ui/icons/AlarmOutlined";
 import InfoIcon from "@material-ui/icons/Info";
 import IconButton from "@material-ui/core/IconButton";
 import {green, red} from "@material-ui/core/colors";
@@ -18,32 +21,59 @@ import isEqual from 'lodash.isequal';
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Box from "@material-ui/core/Box";
 import axios from "axios";
+import FlagIcon from "@material-ui/icons/Flag";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import Button from "@material-ui/core/Button";
+import clsx from "clsx";
+import CardActions from "@material-ui/core/CardActions";
 
 const styles = theme => ({
     list: {
         marginLeft: "auto",
         marginRight: "auto",
         boxShadow: shadows[1],
-    }
+    },
 });
 
 const useStyles = makeStyles(theme => ({
     yes: {
+        // extend: '$icon',
         color: green[600],
-        marginRight: theme.spacing(1)
+        // marginRight: theme.spacing(1)
     },
     no: {
+        // extend: '$icon',
         color: red[600],
-        marginRight: theme.spacing(1)
-    }
+        // marginRight: theme.spacing(1)
+    },
+    icon: {
+        marginRight: theme.spacing(1),
+    },
+    rightIcon: {
+        marginLeft: theme.spacing(1), //lmao idk
+    },
+    flaggableButton: {
+        color: theme.palette.getContrastText(red[500]),
+        backgroundColor: red[600],
+        '&:hover': {
+            backgroundColor: red[800]
+        }
+    },
 }));
 
 function TransactionRow(props) {
     const {index, style, transactionList} = props;
-    const transaction = transactionList[index];
     // console.log(transaction);
     const classes = useStyles();
-    let [student, setStudent] = React.useState();
+    let [transaction, setTransaction] = React.useState(transactionList[index]); //any changes to transaction will not alter transactionList, but that shouldn't matter... right?
+    const handleFlag = () => {
+        const newFlagState = !transaction.flag;
+        //how tf do i flag??
+        axios.patch(`/v1/transactions/${transaction.id}/`, {
+            flag: newFlagState
+        });
+        setTransaction({...transaction, flag: newFlagState});
+    };
     return (
         <ListItem style={ style } key={ index }>
             <ListItemAvatar>
@@ -51,7 +81,12 @@ function TransactionRow(props) {
             </ListItemAvatar>
             <ListItemText primary={ transaction.student.name + ' #' + transaction.student.student_id }
                           secondary={ `Kiosk ${ transaction.kiosk_id } at ${ transaction.timestamp }` }/>
-            { !transaction.flag ? <CheckIcon className={ classes.yes }/> : <CloseIcon className={ classes.no }/> }
+            {transaction.morning_mode ? <AlarmOutlinedIcon className={classes.icon} /> : (transaction.entering ? <React.Fragment><DoubleArrowOutlinedIcon className={classes.icon} /><MeetingRoomOutlinedIcon className={classes.icon} /></React.Fragment> : <React.Fragment><MeetingRoomOutlinedIcon className={classes.icon} /><DoubleArrowOutlinedIcon className={classes.icon} /></React.Fragment>)}
+            { !transaction.flag ? <CheckIcon className={ clsx(classes.icon, classes.yes) }/> : <CloseIcon className={ clsx(classes.icon, classes.no) }/> }
+            <Button onClick={handleFlag} variant="contained" className={clsx({[classes.flaggableButton]: !transaction.flag})}>
+                {!transaction.flag ? "Flag" : "Unflag"}
+                {!transaction.flag ? <FlagIcon className={ classes.rightIcon}/> : <ThumbUpIcon className={classes.rightIcon}/>}
+            </Button>
         </ListItem>
     )
 }
