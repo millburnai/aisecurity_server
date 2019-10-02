@@ -64,6 +64,6 @@ class Transaction(models.Model):
 	timestamp = models.DateTimeField()
 	morning_mode = models.BooleanField()
 	flag = models.BooleanField()
-	movement = models.BooleanField()
+	entering = models.BooleanField()
 
 auditlog.register(Student)

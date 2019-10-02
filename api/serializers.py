@@ -36,4 +36,4 @@ class TransactionSerializer(serializers.HyperlinkedModelSerializer):
     student = StudentSerializer()
     class Meta:
         model = Transaction
-        fields = ['id', 'kiosk_id', 'student', 'entered_id', 'timestamp', 'morning_mode', 'flag', 'movement']
+        fields = ['id', 'kiosk_id', 'student', 'entered_id', 'timestamp', 'morning_mode', 'flag', 'entering']

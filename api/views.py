@@ -118,7 +118,7 @@ def downloadTransaction(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="transaction_download.csv"'
     writer = csv.writer(response)
-    writer.writerow(['internal_id', 'entered_id', 'student_name', 'student_id', 'date', 'time', 'morning', 'movement', 'flagged'])
+    writer.writerow(['internal_id', 'entered_id', 'student_name', 'student_id', 'date', 'time', 'morning', 'entering', 'flagged'])
     for transaction in getTransactionSet(request):
         writer.writerow([
             transaction.pk,
@@ -128,7 +128,7 @@ def downloadTransaction(request):
             transaction.timestamp.astimezone(tz.timezone("America/New_York")).strftime("%x"),
             transaction.timestamp.astimezone(tz.timezone("America/New_York")).strftime("%X"),
             transaction.morning_mode,
-            transaction.movement,
+            transaction.entering,
             transaction.flag,
         ])
     return response
@@ -159,7 +159,7 @@ def kioskLogin(request):
         else:
             movement = True
 
-    trans_id = Transaction.objects.create(kiosk_id=kiosk,student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement).id
+    trans_id = Transaction.objects.create(kiosk_id=kiosk,student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, entering=movement).id
 
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
@@ -170,7 +170,7 @@ def kioskLogin(request):
         'timestamp': datetime.now(tz=timezone.utc),
         'morning_mode': gen_morning,
         'flag': autoflag,
-        'movement': movement,
+        'entering': movement,
     }})
 
     if search_student is not None:
