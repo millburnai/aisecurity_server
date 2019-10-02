@@ -67,6 +67,7 @@ function StudentDialog(props) {
         setStudent({...student, [attr]: event.target.value});
     };
     function EditableAttribute(variant, label, attr, type) {
+        //this is horrible i dont even know why i chose to do it like this
         return !editing ? (
             <Typography variant={variant}>{`${label}: ${typeof student[attr] === 'boolean' ? ['No','Yes'][+student[attr]] : student[attr]}`}</Typography>
         ) : (
