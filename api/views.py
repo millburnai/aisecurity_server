@@ -159,15 +159,17 @@ def kioskLogin(request):
         else:
             movement = True
 
-    Transaction.objects.create(kiosk_id=kiosk,student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement)
+    trans_id = Transaction.objects.create(kiosk_id=kiosk,student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, movement=movement).id
 
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
         'kiosk_id': kiosk,
+        "transaction_id" trans_id,
         'student': search_student.clean() if search_student is not None else None,
         'entered_id': entered_id,
         'morning_mode': gen_morning,
-        'flag': autoflag
+        'flag': autoflag,
+        'going_in': movement,
     }})
 
     if search_student is not None:
