@@ -153,13 +153,13 @@ def kioskLogin(request):
         autoflag = search_student.privilege_granted == 0 and gen_morning == False
 
     movement = False
-    if search_student is not None and search_student.privilege_granted:
+    if search_student is not None:
         if not gen_morning:
             movement = search_student.toggleIn(date.today())
         else:
             movement = True
 
-    trans_id = Transaction.objects.create(kiosk_id=kiosk,student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, entering=movement).id
+    trans_id = Transaction.objects.create(kiosk_id=kiosk, student=search_student, entered_id=entered_id, timestamp=datetime.now(tz=timezone.utc), morning_mode=gen_morning, flag=autoflag, entering=movement).id
 
 
     async_to_sync(get_channel_layer().group_send)("security", {'type': 'message', 'message': {
@@ -167,7 +167,7 @@ def kioskLogin(request):
         'kiosk_id': kiosk,
         'student': search_student.clean() if search_student is not None else None,
         'entered_id': entered_id,
-        'timestamp': datetime.now(tz=timezone.utc),
+        'timestamp': str(datetime.now(tz=timezone.utc)),
         'morning_mode': gen_morning,
         'flag': autoflag,
         'entering': movement,
@@ -179,7 +179,7 @@ def kioskLogin(request):
                                   "accept": True if gen_morning else search_student.privilege_granted,
                                   "seniorPriv": True if gen_morning else search_student.privilege_granted,
                                   "id": search_student.student_id,
-                                  "going_in": movement,
+                                  "in": movement,
                                   }
                             )
 

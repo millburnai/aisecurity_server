@@ -21,16 +21,16 @@ class StudentDateInOutStatusSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['date', 'in_school', 'resolved']
 
 class StudentSerializer(serializers.HyperlinkedModelSerializer):
-    end_states = serializers.SerializerMethodField('get_end_states')
+    in_school = serializers.SerializerMethodField('get_end_states')
 
     def get_end_states(self, student):
-        qs = student.end_states.all().filter(date=date.today())
-        serializer = StudentDateInOutStatusSerializer(instance=qs, many=True)
-        return serializer.data
+        qs = student.end_states.all().filter(date=date.today()).all()
+        status = qs[0].in_school if len(qs) != 0 else True
+        return status
 
     class Meta:
         model = Student
-        fields = ['student_id', 'name', 'grade', 'privilege_granted', 'pathToImage', 'end_states']
+        fields = ['student_id', 'name', 'grade', 'privilege_granted', 'pathToImage', 'in_school']
 
 class TransactionSerializer(serializers.HyperlinkedModelSerializer):
     student = StudentSerializer()
