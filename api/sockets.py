@@ -26,15 +26,16 @@ class PiSocket(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("pi", self.channel_name)
         await self.accept()
-        self.kiosk_id = kiosk_num
-        kiosk_num += 1
-        print(self.kiosk_id)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("pi", self.channel_name)
 
     async def receive(self, text_data):
         print("reciveing data")
+        self.kiosk_id = kiosk_num
+        kiosk_num += 1
+        print(self.kiosk_id)
+        print(text_data)
 
     async def message(self, event):
         print("sending data")

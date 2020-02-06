@@ -27,7 +27,7 @@ def on_open(ws):
 
 if __name__ == "__main__":
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("ws://172.31.217.136:8000/v1/guard/live",
+    ws = websocket.WebSocketApp("ws://172.31.217.136:8000/v1/pi",
                               on_message = on_message,
                               on_error = on_error,
                               on_close = on_close)
