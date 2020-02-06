@@ -38,9 +38,7 @@ class PiSocket(AsyncWebsocketConsumer):
 application = ProtocolTypeRouter({
     "websocket": URLRouter([
         url("v1/guard/live", SecuritySocket),
-    ]),
-    "piwebsocket": URLRouter([
-        url("v1/pi", SecuritySocket)
+	url("v1/pi", SecuritySocket),
     ]),
 })
 
