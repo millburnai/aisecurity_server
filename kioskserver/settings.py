@@ -84,7 +84,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-ASGI_APPLICATION = 'api.socket.application'
+ASGI_APPLICATION = 'api.sockets.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases

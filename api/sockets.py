@@ -3,6 +3,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.routing import ProtocolTypeRouter, URLRouter
 import json
 
+kiosk_status = []
+kiosk_num = 0
 
 class SecuritySocket(AsyncWebsocketConsumer):
     async def connect(self):
@@ -20,9 +22,13 @@ class SecuritySocket(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(event['message']))
 
 class PiSocket(AsyncWebsocketConsumer):
+
     async def connect(self):
         await self.channel_layer.group_add("pi", self.channel_name)
         await self.accept()
+        self.kiosk_id = kiosk_num
+        kiosk_num += 1
+        print(self.kiosk_id)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("pi", self.channel_name)
@@ -38,7 +44,7 @@ class PiSocket(AsyncWebsocketConsumer):
 application = ProtocolTypeRouter({
     "websocket": URLRouter([
         url("v1/guard/live", SecuritySocket),
-	url("v1/pi", SecuritySocket),
+	url("v1/pi", PiSocket),
     ]),
 })
 
