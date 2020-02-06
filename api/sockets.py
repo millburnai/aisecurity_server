@@ -40,7 +40,7 @@ class PiSocket(AsyncWebsocketConsumer):
         self.kiosk_id = text_data
         print(self.kiosk_id)
         while(True):
-            self.message({"message":boolean})
+            await self.message({"message":boolean})
 
 
 application = ProtocolTypeRouter({
