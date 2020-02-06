@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.routing import ProtocolTypeRouter, URLRouter
 import json
 
-kiosk_status = []
+boolean = False
 
 class SecuritySocket(AsyncWebsocketConsumer):
     async def connect(self):
@@ -27,8 +27,6 @@ class PiSocket(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("pi", self.channel_name)
         await self.accept()
-        while(True):
-            x = 0
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("pi", self.channel_name)
@@ -37,6 +35,8 @@ class PiSocket(AsyncWebsocketConsumer):
         print("reciveing data")
         self.kiosk_id = text_data
         print(self.kiosk_id)
+        while(True):
+            message({"message":boolean})
 
 
     async def message(self, event):
