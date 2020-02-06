@@ -31,17 +31,16 @@ class PiSocket(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("pi", self.channel_name)
 
+    async def message(self, event):
+        print("sending data")
+        await self.send(text_data=json.dumps(event['message']))
+
     async def receive(self, text_data):
         print("reciveing data")
         self.kiosk_id = text_data
         print(self.kiosk_id)
         while(True):
             message({"message":boolean})
-
-
-    async def message(self, event):
-        print("sending data")
-        await self.send(text_data=json.dumps(event['message']))
 
 
 application = ProtocolTypeRouter({
