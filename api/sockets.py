@@ -4,7 +4,6 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 import json
 
 kiosk_status = []
-kiosk_num = 0
 
 class SecuritySocket(AsyncWebsocketConsumer):
     async def connect(self):
@@ -16,6 +15,8 @@ class SecuritySocket(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         print("reciveing data")
+        self.kiosk_id = text_data
+        print(self.kiosk_id)
 
     async def message(self, event):
         print("sending data")
@@ -26,17 +27,17 @@ class PiSocket(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("pi", self.channel_name)
         await self.accept()
+        while(True):
+            x = 0
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("pi", self.channel_name)
 
     async def receive(self, text_data):
         print("reciveing data")
-        global kiosk_num
-        self.kiosk_id = kiosk_num
-        kiosk_num += 1
+        self.kiosk_id = text_data
         print(self.kiosk_id)
-        print(text_data)
+
 
     async def message(self, event):
         print("sending data")
