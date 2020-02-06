@@ -32,6 +32,7 @@ class PiSocket(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         print("reciveing data")
+        global kiosk_num
         self.kiosk_id = kiosk_num
         kiosk_num += 1
         print(self.kiosk_id)
