@@ -29,22 +29,24 @@ class PiSocket(AsyncWebsocketConsumer):
 
     @classmethod
     def get_instances(cls):
+        dead = set()
         for ref in cls._instances:
-            obj = ref()
-            if obj is not None:
-                yield obj
+            if ref().kiosk_id is not None:
+                yield ref()
             else:
                 dead.add(ref)
         cls._instances -= dead
 
 
     async def connect(self):
+
         await self.channel_layer.group_add("pi", self.channel_name)
         await self.accept()
-        await self._instances.add(weakref.ref(self))
+        self._instances.add(weakref.ref(self))
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("pi", self.channel_name)
+        self.kiosk_id = None
 
     async def message(self, event):
         print("sending data")
