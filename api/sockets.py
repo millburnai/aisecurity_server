@@ -11,7 +11,7 @@ class SecuritySocket(AsyncWebsocketConsumer):
         await self.channel_layer.group_add("security", self.channel_name)
         await self.accept()
         for obj in PiSocket.get_instances():
-            print(obj.kiosk_id)
+            obj.message({"message":"Success!"})
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("security", self.channel_name)
@@ -19,7 +19,6 @@ class SecuritySocket(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print("reciveing data")
         self.kiosk_id = text_data
-        print(self.kiosk_id)
 
     async def message(self, event):
         print("sending data")
