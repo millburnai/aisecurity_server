@@ -2,6 +2,7 @@ from django.conf.urls import url
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.routing import ProtocolTypeRouter, URLRouter
 import json
+import weakref 
 
 boolean = False
 
@@ -24,9 +25,23 @@ class SecuritySocket(AsyncWebsocketConsumer):
 
 class PiSocket(AsyncWebsocketConsumer):
 
+    _instances = set()
+
+    @classmethod
+    def get_instances(cls):
+        for ref in cls._instances:
+            obj = ref()
+            if obj is not None:
+                yield obj
+            else:
+                dead.add(ref)
+        cls._instances -= dead
+
+
     async def connect(self):
         await self.channel_layer.group_add("pi", self.channel_name)
         await self.accept()
+        await self._instances.add(weakref.ref(self))
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("pi", self.channel_name)
@@ -38,7 +53,8 @@ class PiSocket(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print("reciveing data")
         self.kiosk_id = text_data
-        print(self.kiosk_id)
+        for obj in self.get_instances():
+            print(obj.kiosk_id)
         await self.message({"message":boolean})
 
 

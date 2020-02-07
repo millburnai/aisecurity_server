@@ -1,4 +1,5 @@
 import websocket
+import json
 try:
     import thread
 except ImportError:
