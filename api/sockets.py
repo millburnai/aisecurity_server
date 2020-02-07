@@ -10,6 +10,8 @@ class SecuritySocket(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("security", self.channel_name)
         await self.accept()
+        for obj in PiSocket.get_instances():
+            print(obj.kiosk_id)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("security", self.channel_name)
@@ -31,7 +33,7 @@ class PiSocket(AsyncWebsocketConsumer):
     def get_instances(cls):
         dead = set()
         for ref in cls._instances:
-            if ref().kiosk_id is not None:
+            if ref() is not None:
                 yield ref()
             else:
                 dead.add(ref)
@@ -55,8 +57,6 @@ class PiSocket(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print("reciveing data")
         self.kiosk_id = text_data
-        for obj in self.get_instances():
-            print(obj.kiosk_id)
         await self.message({"message":boolean})
 
 
