@@ -4,14 +4,12 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 import json
 import weakref 
 
-boolean = False
-
-class SecuritySocket(AsyncWebsocketConsumer):
+class NanoSocket(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("security", self.channel_name)
         await self.accept()
         for obj in PiSocket.get_instances():
-            obj.message({"message":"Success!"})
+            await obj.message({"message":"Success!"})
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("security", self.channel_name)
@@ -56,13 +54,29 @@ class PiSocket(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print("reciveing data")
         self.kiosk_id = text_data
-        await self.message({"message":boolean})
+        await self.message({"message":"kiosk_id: "+str(self.kiosk_id)})
+
+class SecuritySocket(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.channel_layer.group_add("security", self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard("security", self.channel_name)
+
+    async def receive(self, text_data):
+        print("reciveing data")
+
+    async def message(self, event):
+        print("sending data")
+        await self.send(text_data=json.dumps(event['message']))
 
 
 application = ProtocolTypeRouter({
     "websocket": URLRouter([
-        url("v1/guard/live", SecuritySocket),
-	url("v1/pi", PiSocket),
+        url("v1/nano", NanoSocket),
+        url("v1/pi", PiSocket),
+        url("v1/guard/live", SecuritySocket)
     ]),
 })
 
