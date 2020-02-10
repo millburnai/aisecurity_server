@@ -9,7 +9,7 @@ class NanoSocket(AsyncWebsocketConsumer):
         await self.channel_layer.group_add("security", self.channel_name)
         await self.accept()
         for obj in PiSocket.get_instances():
-            if self.kiosk_id = obj.kiosk_id:
+            if self.kiosk_id == obj.kiosk_id:
                 await obj.message({"message":"Success!"})
 
     async def disconnect(self, close_code):
