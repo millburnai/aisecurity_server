@@ -8,17 +8,18 @@ class NanoSocket(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("security", self.channel_name)
         await self.accept()
-        for obj in PiSocket.get_instances():
-            if self.kiosk_id == obj.kiosk_id:
-                await obj.message({"message":"Success!"})
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("security", self.channel_name)
 
     async def receive(self, text_data):
         print("reciveing data")
-        self.kiosk_id = text_data
-
+        try:
+            self.kiosk_id = json.loads(text_data)['id']
+        except KeyError:
+            for obj in PiSocket.get_instances():
+                if self.kiosk_id = obj.kiosk_id:
+                    await obj.message({"message":json.loads(text_data)['best_match']})
     async def message(self, event):
         print("sending data")
         await self.send(text_data=json.dumps(event['message']))
