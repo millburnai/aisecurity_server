@@ -3,6 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.routing import ProtocolTypeRouter, URLRouter
 import json
 import weakref 
+import time
 
 class NanoSocket(AsyncWebsocketConsumer):
     async def connect(self):
@@ -13,13 +14,17 @@ class NanoSocket(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard("security", self.channel_name)
 
     async def receive(self, text_data):
+
+        print(json.loads(text_data))
         print("reciveing data")
-        try:
+        try: 
             self.kiosk_id = json.loads(text_data)['id']
         except KeyError:
+            print(json.loads(text_data))
             for obj in PiSocket.get_instances():
-                if self.kiosk_id = obj.kiosk_id:
-                    await obj.message({"message":json.loads(text_data)['best_match']})
+                if self.kiosk_id == obj.kiosk_id:
+                    await obj.message({"message":json.loads(text_data)["best_match"]})
+
     async def message(self, event):
         print("sending data")
         await self.send(text_data=json.dumps(event['message']))
@@ -42,7 +47,7 @@ class PiSocket(AsyncWebsocketConsumer):
     async def connect(self):
 
         await self.channel_layer.group_add("pi", self.channel_name)
-        await self.accept()
+        await self.accept() 
         self._instances.add(weakref.ref(self))
 
     async def disconnect(self, close_code):
@@ -56,7 +61,7 @@ class PiSocket(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         print("reciveing data")
         self.kiosk_id = text_data
-        await self.message({"message":"kiosk_id: "+str(self.kiosk_id)})
+        #await self.message({"message":"kiosk_id: "+str(self.kiosk_id)})
 
 class SecuritySocket(AsyncWebsocketConsumer):
     async def connect(self):
