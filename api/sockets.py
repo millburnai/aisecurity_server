@@ -6,6 +6,18 @@ import weakref
 import time
 
 class NanoSocket(AsyncWebsocketConsumer):
+    _instances = set()
+
+    @classmethod
+    def get_instances(cls):
+        dead = set()
+        for ref in cls._instances:
+            if ref() is not None:
+                yield ref()
+            else:
+                dead.add(ref)
+        cls._instances -= dead
+
     async def connect(self):
         await self.channel_layer.group_add("security", self.channel_name)
         await self.accept()
@@ -17,13 +29,15 @@ class NanoSocket(AsyncWebsocketConsumer):
 
         print(json.loads(text_data))
         print("reciveing data")
-        try: 
-            self.kiosk_id = json.loads(text_data)['id']
-        except KeyError:
-            print(json.loads(text_data))
+        data = json.loads(text_data)
+        if 'id' in data: 
+            self.kiosk_id = data['id']
+        elif 'best_match' in data:
             for obj in PiSocket.get_instances():
                 if self.kiosk_id == obj.kiosk_id:
-                    await obj.message({"message":json.loads(text_data)["best_match"]})
+                    await obj.message({"message":data['best_match']})
+        elif 'signal' in data:
+            await self.message({"message":"break"})
 
     async def message(self, event):
         print("sending data")
@@ -60,7 +74,14 @@ class PiSocket(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         print("reciveing data")
-        self.kiosk_id = text_data
+        data = json.loads(text_data)
+        if 'id' in data: 
+            self.kiosk_id = data['id']
+        elif 'signal' in data:
+            for obj in NanoSocket.get_instances():
+                if self.kiosk_id == obj.kiosk_id:
+                    await obj.message({"message":data['signal']})
+
         #await self.message({"message":"kiosk_id: "+str(self.kiosk_id)})
 
 class SecuritySocket(AsyncWebsocketConsumer):
