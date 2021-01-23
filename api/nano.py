@@ -26,7 +26,7 @@ def on_open(ws):
 
 if __name__ == "__main__":
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("ws://172.31.217.136:8000/v1/nano",
+    ws = websocket.WebSocketApp("ws://127.0.0.1:8000/v1/nano",
                               on_message = lambda ws,msg: on_message(ws, msg),
                               on_error = on_error,
                               on_close = on_close)

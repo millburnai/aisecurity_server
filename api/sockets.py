@@ -102,9 +102,9 @@ class SecuritySocket(AsyncWebsocketConsumer):
 
 application = ProtocolTypeRouter({
     "websocket": URLRouter([
-        url("v1/nano", NanoSocket),
-        url("v1/pi", PiSocket),
-        url("v1/guard/live", SecuritySocket)
+        url("v1/nano", NanoSocket.as_asgi()),
+        url("v1/pi", PiSocket.as_asgi()),
+        url("v1/guard/live", SecuritySocket.as_asgi())
     ]),
 })
 

@@ -79,7 +79,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('localhost', 6379)],
         },
     },
 }
@@ -89,6 +89,8 @@ ASGI_APPLICATION = 'api.sockets.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+
+'''
 database_config = os.environ['DATABASE_CONFIG'] if 'DATABASE_CONFIG' in os.environ else '/home/kiosk/kioskv3/kioskserver/my.cnf'
 DATABASES = {
     'default': {
@@ -98,7 +100,20 @@ DATABASES = {
         },
     }
 }
+'''
 
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'database name',
+        'USER': 'username',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1', 
+        'PORT': '3306',
+    }
+}
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
