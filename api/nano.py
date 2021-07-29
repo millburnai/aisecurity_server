@@ -18,15 +18,16 @@ def on_close(ws):
 
 def on_open(ws):
     def run(*args):
-        ws.send(json.dumps({"idd":"1"}))
-        time.sleep(1)
+        ws.send(json.dumps({"id":"1"}))
+        time.sleep(5)
+        ws.send(json.dumps({"best_match":"liam_pilarski"}))
     #print("thread terminating...")
     thread.start_new_thread(run, ())
 
 
 if __name__ == "__main__":
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("ws://127.0.0.1:8000/v1/nano",
+    ws = websocket.WebSocketApp("ws://10.56.9.186:8000/v1/nano",
                               on_message = lambda ws,msg: on_message(ws, msg),
                               on_error = on_error,
                               on_close = on_close)

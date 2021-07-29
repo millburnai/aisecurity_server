@@ -21,26 +21,27 @@ class NanoSocket(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("security", self.channel_name)
         await self.accept()
+        self._instances.add(weakref.ref(self))
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("security", self.channel_name)
 
     async def receive(self, text_data):
 
-        print(json.loads(text_data))
-        print("reciveing data")
+        print("(NANO) Receiving data: {}".format(json.loads(text_data)))
         data = json.loads(text_data)
         if 'id' in data: 
+            self.signal = True
             self.kiosk_id = data['id']
         elif 'best_match' in data:
             for obj in PiSocket.get_instances():
-                if self.kiosk_id == obj.kiosk_id:
+                if self.kiosk_id == obj.kiosk_id and self.signal:
+                    print("(NANO) Sending data ({}) to pi {}".format(data['best_match'], obj.kiosk_id))
                     await obj.message({"message":data['best_match']})
         elif 'signal' in data:
             await self.message({"message":"break"})
 
     async def message(self, event):
-        print("sending data")
         await self.send(text_data=json.dumps(event['message']))
 
 class PiSocket(AsyncWebsocketConsumer):
@@ -69,18 +70,17 @@ class PiSocket(AsyncWebsocketConsumer):
         self.kiosk_id = None
 
     async def message(self, event):
-        print("sending data")
         await self.send(text_data=json.dumps(event['message']))
 
     async def receive(self, text_data):
-        print("reciveing data")
+        print("(PI) Receiving data: {}".format(json.loads(text_data)))
         data = json.loads(text_data)
         if 'id' in data: 
             self.kiosk_id = data['id']
         elif 'signal' in data:
             for obj in NanoSocket.get_instances():
                 if self.kiosk_id == obj.kiosk_id:
-                    await obj.message({"message":data['signal']})
+                    obj.signal = data['signal']
 
         #await self.message({"message":"kiosk_id: "+str(self.kiosk_id)})
 

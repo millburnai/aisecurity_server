@@ -18,15 +18,16 @@ def on_close(ws):
 
 def on_open(ws):
     def run(*args):
-        ws.send("1")
+        ws.send(json.dumps({"id":"1"}))
         time.sleep(1)
+        ws.send(json.dumps({"signal":False}))
     #print("thread terminating...")
     thread.start_new_thread(run, ())
 
 
 if __name__ == "__main__":
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("ws://172.31.217.136:8000/v1/pi",
+    ws = websocket.WebSocketApp("ws://10.56.9.186:8000/v1/pi",
                               on_message = lambda ws,msg: on_message(ws, msg),
                               on_error = on_error,
                               on_close = on_close)
