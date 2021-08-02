@@ -19,7 +19,7 @@ def on_close(ws):
 def on_open(ws):
     def run(*args):
         ws.send(json.dumps({"id":"1"}))
-        time.sleep(5)
+        time.sleep(1)
         ws.send(json.dumps({"best_match":"liam_pilarski"}))
     #print("thread terminating...")
     thread.start_new_thread(run, ())
