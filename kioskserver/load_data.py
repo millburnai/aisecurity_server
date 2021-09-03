@@ -1,5 +1,9 @@
+import sys
+sys.path.insert(1, "../")
 import csv
 import api.models
+
+FILENAME = "/home/kiosk/Downloads/roster.csv"
 
 with open(FILENAME) as csv_file:
 	reader = csv.reader(csv_file)
