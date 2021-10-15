@@ -150,17 +150,8 @@ class LiveView extends Component {
         });
         this.socket.addEventListener('message', function(event) {
             const msg = JSON.parse(event.data);
-            console.log(msg);
-	    msg.idx = ++this.uniqueKey;
+            msg.idx = ++this.uniqueKey;
             msg.kiosk_id = parseInt(msg.kiosk_id);
-	    if (msg.student === null) {
-	        msg.student = {
-		    name: "Invalid Student",
-		    student_id: msg.entered_id,
-		    pathToImage: 'bad_profile.jpg',
-		    privilege_granted: false
-		}
-	    }
             this.setState((prevState) => {
                 let data = prevState.data;
                 data[msg.kiosk_id] = [msg, ...data[msg.kiosk_id]];
