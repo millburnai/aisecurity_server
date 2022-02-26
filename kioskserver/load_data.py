@@ -2,12 +2,13 @@ import csv
 import os
 import sys
 sys.path.insert(1, "../")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kioskserver.settings")
 
 import django
 django.setup()
 from api.models import Student
 
-FILENAME = "/home/kiosk/Downloads/roster.csv"
+FILENAME = "/Users/michaelpilarski/Desktop/aisecurity_server/roster.csv"
 with open(FILENAME) as csv_file:
 	reader = csv.reader(csv_file)
 	for pos, row in enumerate(reader):

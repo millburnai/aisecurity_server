@@ -91,7 +91,7 @@ ASGI_APPLICATION = 'api.sockets.application'
 
 
 
-database_config = os.environ['DATABASE_CONFIG'] if 'DATABASE_CONFIG' in os.environ else '/home/kiosk/kioskv3/kioskserver/my.cnf'
+database_config = os.environ['DATABASE_CONFIG'] if 'DATABASE_CONFIG' in os.environ else '/Users/michaelpilarski/Desktop/aisecurity_server/my.cnf'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

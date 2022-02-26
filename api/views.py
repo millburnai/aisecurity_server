@@ -13,6 +13,7 @@ import csv
 import pytz as tz
 from . import IN_MORNING_MODE
 
+print(Student.objects.all())
 
 # idk if this is done right, just change it if it isn't
 def IndexWebApp(request):
