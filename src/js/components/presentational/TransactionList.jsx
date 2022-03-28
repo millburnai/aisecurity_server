@@ -77,7 +77,7 @@ function TransactionRow(props) {
     return (
         <ListItem style={ style } key={ index }>
             <ListItemAvatar>
-                <Avatar alt="Avatar" src={ '/static/img/' + transaction.student.pathToImage }/>
+                <Avatar alt="Avatar" src={ '/static/img/students/' + transaction.student.student_id + ".jpg" }/>
             </ListItemAvatar>
             <ListItemText primary={ transaction.student.name + ' #' + transaction.student.student_id }
                           secondary={ `Kiosk ${ transaction.kiosk_id } at ${ transaction.timestamp }` }/>

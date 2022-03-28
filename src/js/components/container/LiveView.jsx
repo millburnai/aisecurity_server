@@ -34,7 +34,7 @@ const LiveCard = (props) => {
     };
     const useStyles = makeStyles(theme => ({
         card: {
-            maxWidth: 400,
+            maxWidth: 300,
             margin: theme.spacing(1),
         },
         flaggedCard: { //listen i know this is ugly af don't judge me, i just want to finish this damn project
@@ -65,7 +65,9 @@ const LiveCard = (props) => {
             }
         },
         profile: {
-            height: 500,
+            height: 150,
+            width: 107,
+            margin: "auto",
         },
         secondaryAction: {
             marginLeft: 'auto',
@@ -90,7 +92,7 @@ const LiveCard = (props) => {
                     </IconButton>
                 }
             />
-            <CardMedia image={"/static/img/" + data.student.pathToImage} className={classes.profile} />
+            <CardMedia image={"/static/img/students/" + data.student.student_id + ".jpg"} className={classes.profile} />
             <CardActions>
                 {data.morning_mode ? <AlarmIcon/> : (data.entering ? <React.Fragment><DoubleArrowIcon/><MeetingRoomIcon/></React.Fragment> : <React.Fragment><MeetingRoomIcon/><DoubleArrowIcon/></React.Fragment>)}
                 <span>
@@ -204,3 +206,4 @@ LiveView.propTypes = {
 };
 
 export default withStyles(styles)(LiveView);
+
