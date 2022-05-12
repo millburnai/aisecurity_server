@@ -34,7 +34,7 @@ urlpatterns = [
     path('v1/download/transactions', views.downloadTransaction),
     path('v1/morning', views.getMorningMode),
     path('v1/morning/set', views.setMorningMode),
-    path('v1/admin/', admin.site.urls),
+    path('admin', admin.site.urls),
     path('kiosk/login', views.kioskLogin),
     path('', views.IndexWebApp),
     path('students', views.IndexWebApp),

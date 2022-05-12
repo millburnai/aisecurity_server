@@ -59,7 +59,7 @@ class Student(models.Model):
 
 class Transaction(models.Model):
 	kiosk_id = models.IntegerField()
-	student = models.ForeignKey(Student, models.PROTECT, null=True)
+	student = models.ForeignKey(Student, models.CASCADE, null=True)
 	entered_id = models.IntegerField()
 	timestamp = models.DateTimeField()
 	morning_mode = models.BooleanField()
