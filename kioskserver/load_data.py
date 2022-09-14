@@ -10,7 +10,7 @@ from api.models import Student
 Student.objects.all().delete()
 
 print(Student.objects.all())
-FILENAME = "/home/kiosk/Downloads/roster.csv"
+FILENAME = "./roster.csv"
 with open(FILENAME) as csv_file:
 	reader = csv.reader(csv_file)
 	for pos, row in enumerate(reader):
@@ -23,6 +23,7 @@ with open(FILENAME) as csv_file:
                 print(grade)
                 privilege_granted = True if int(grade)==12 else False
                 pathToImage = row[3]
+                print(pathToImage)
                 print(Student.objects.all().filter(pk=student_id))
                 if (len(Student.objects.all().filter(pk=student_id)) == 0):
                     Student.objects.create(name=name, grade=grade, student_id=student_id,privilege_granted=privilege_granted,pathToImage=pathToImage)
