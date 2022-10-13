@@ -2,6 +2,8 @@ from django.db import models
 from auditlog.registry import auditlog
 from django.contrib.auth.models import AbstractUser
 from auditlog.models import AuditlogHistoryField
+import datetime
+import csv
 
 # Create your models here.
 
@@ -57,13 +59,27 @@ class Student(models.Model):
 			print("THIS IS VERY BAD")
 			return False
 
-class Transaction(models.Model):
-	kiosk_id = models.IntegerField()
-	student = models.ForeignKey(Student, models.CASCADE, null=True)
-	entered_id = models.IntegerField()
-	timestamp = models.DateTimeField()
-	morning_mode = models.BooleanField()
-	flag = models.BooleanField()
-	entering = models.BooleanField()
+start = datetime.time(8, 0, 0)
+end = datetime.time(13, 59, 0)
 
-auditlog.register(Student)
+def time_in_range(start, end, current):	
+    """Returns whether current is in the range [start, end]"""
+    print(start, end, current)
+    return start <= current <= end
+
+with open('late_students.csv', 'w', newline='') as write_obj:
+    csv_writer = csv.writer(write_obj)
+    csv_writer.writerow(['Student ID', 'Name', 'Time'])
+
+class Transaction(models.Model):
+    current = datetime.datetime.now().time()
+    kiosk_id = models.IntegerField()
+    student = models.ForeignKey(Student, models.CASCADE, null=True)
+    entered_id = models.IntegerField()
+
+    timestamp = models.DateTimeField()
+    morning_mode = models.BooleanField()
+    flag = models.BooleanField()
+    entering = models.BooleanField()
+
+    auditlog.register(Student)

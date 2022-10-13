@@ -10,6 +10,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.forms.models import model_to_dict
 import csv
+from datetime import datetime, date
+import os
 import pytz as tz
 from . import IN_MORNING_MODE
 
@@ -175,6 +177,7 @@ def kioskLogin(request):
 
     if search_student is not None:
         accepted = True if gen_morning else search_student.privilege_granted
+        checkLateStudent(search_student.name, search_student.student_id, True if gen_morning else search_student.privilege_granted, movement)
         return JsonResponse(data={"name": search_student.name,
                                   "accept": True if gen_morning else search_student.privilege_granted,
                                   "seniorPriv": True if gen_morning else search_student.privilege_granted,
@@ -185,6 +188,26 @@ def kioskLogin(request):
 
     return JsonResponse(data={"name": "Invalid ID", "accept": False, "id": 00000, "seniorPriv": 0, "in": 0})
 
+def checkLateStudent(studentName, studentId, seniorPriv, movement):
+    curtime = datetime.now()
+    print(os.getcwd())
+    curday = str(date.today())
+    curhour = curtime.hour - 4
+    curmin = curtime.minute
+    cursecond = curtime.second
+    testing = False
+    if ((curhour == 8 and curmin <= 15 and curmin >= 0) or testing):
+        filename = curday + ".csv"
+        csvexists = True if not os.path.exists("gdrive/Late Students/"+filename) else False
+        print(csvexists)
+        f = open("gdrive/Late Students/" + filename, "a")
+        if csvexists:
+            csv.writer(f).writerow(["Name", "ID", "Time", "Senior Privilege", "Movement"])
+        csv.writer(f).writerow([studentName, studentId, str(curhour) + ":" + ("0" if curmin < 10 else "" ) + str(curmin) + " AM", str(seniorPriv), "Incoming" if movement else "Outgoing"])
+        f.close()
+        os.chdir("gdrive")
+        os.system("drive push & y")
+        os.chdir("..")
 
 def revertStudent(request):
     def fix(val, current):
@@ -234,3 +257,4 @@ def setMorningMode(request):
     setTo = True if int(request.GET.get("status", "None")) == 1 else False
     IN_MORNING_MODE = setTo
     return getMorningMode(request)
+
