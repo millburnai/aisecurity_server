@@ -26,6 +26,7 @@ class Student(models.Model):
 
 	def __str__(self):
 		return "Student: " + self.name
+		# return self.name + "," + str(self.grade)
 	
 	def clean(self):
 		return {"name": self.name, "student_id": self.student_id, "grade": self.grade, "privilege_granted": self.privilege_granted}

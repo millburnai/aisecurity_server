@@ -147,6 +147,10 @@ def kioskLogin(request):
     search_student = Student.objects.all().filter(student_id=entered_id)
     search_student = None if len(search_student) == 0 else search_student[0]
 
+    # search_student = Student.objects.all().filter(student_id=entered_id)
+    # search_student = str(search_student[0]).split(",")
+    # grade = int(search_student[1])
+    # search_student = None if len(search_student) == 0 else search_student[0]
     automorningmode = datetime.now().hour == 11 and datetime.now().minute > 45
     gen_morning = IN_MORNING_MODE or automorningmode
 
@@ -177,7 +181,7 @@ def kioskLogin(request):
 
     if search_student is not None:
         accepted = True if gen_morning else search_student.privilege_granted
-        checkLateStudent(search_student.name, search_student.student_id, True if gen_morning else search_student.privilege_granted, movement)
+        checkLateStudent(search_student.name, search_student.student_id, True if gen_morning else search_student.privilege_granted, movement, int(search_student.grade))
         return JsonResponse(data={"name": search_student.name,
                                   "accept": True if gen_morning else search_student.privilege_granted,
                                   "seniorPriv": True if gen_morning else search_student.privilege_granted,
@@ -188,23 +192,38 @@ def kioskLogin(request):
 
     return JsonResponse(data={"name": "Invalid ID", "accept": False, "id": 00000, "seniorPriv": 0, "in": 0})
 
-def checkLateStudent(studentName, studentId, seniorPriv, movement):
+def checkLateStudent(studentName, studentId, seniorPriv, movement, grade):\
+
+    # Get all the datetime stuff 
     curtime = datetime.now()
-    print(os.getcwd())
     curday = str(date.today())
     curhour = curtime.hour - 4
+
+    # Since the datetime timezone is 4 hours ahead, we have to check if its the next day in datetime and account for that in this if statement
+    nextday = True if curhour < 0 else False
+    if nextday:
+        curhour += 24
+        curday = curday.split("-")
+        curday[2] = str(int(curday[2])-1)
+        curday = "-".join(curday)
     curmin = curtime.minute
     cursecond = curtime.second
+    morning = True if curhour <= 12 else False
+
+    #Make this true if you want to test out the csv appending system
     testing = False
+
+    # This is where the csv gets created and/or edited if the time is between 8:00 - 8:15 (inclusive)
     if ((curhour == 8 and curmin <= 15 and curmin >= 0) or testing):
         filename = curday + ".csv"
         csvexists = True if not os.path.exists("gdrive/Late Students/"+filename) else False
-        print(csvexists)
         f = open("gdrive/Late Students/" + filename, "a")
         if csvexists:
-            csv.writer(f).writerow(["Name", "ID", "Time", "Senior Privilege", "Movement"])
-        csv.writer(f).writerow([studentName, studentId, str(curhour) + ":" + ("0" if curmin < 10 else "" ) + str(curmin) + " AM", str(seniorPriv), "Incoming" if movement else "Outgoing"])
+            csv.writer(f).writerow(["Name", "ID", "Time", "Senior Privilege", "Movement", "Grade"])
+        csv.writer(f).writerow([studentName, studentId, (str(curhour) if morning else str(curhour-12)) + ":" + ("0" if curmin < 10 else "" ) + str(curmin) + (" AM" if morning else " PM"), str(seniorPriv), "Incoming" if movement else "Outgoing", grade])
         f.close()
+
+        #This runs terminal commands to push the changes made to drive
         os.chdir("gdrive")
         os.system("drive push & y")
         os.chdir("..")
