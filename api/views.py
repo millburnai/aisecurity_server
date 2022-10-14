@@ -192,7 +192,7 @@ def kioskLogin(request):
 
     return JsonResponse(data={"name": "Invalid ID", "accept": False, "id": 00000, "seniorPriv": 0, "in": 0})
 
-def checkLateStudent(studentName, studentId, seniorPriv, movement, grade):\
+def checkLateStudent(studentName, studentId, seniorPriv, movement, grade):
 
     # Get all the datetime stuff 
     curtime = datetime.now()
@@ -214,7 +214,7 @@ def checkLateStudent(studentName, studentId, seniorPriv, movement, grade):\
     testing = False
 
     # This is where the csv gets created and/or edited if the time is between 8:00 - 8:15 (inclusive)
-    if ((curhour == 8 and curmin <= 15 and curmin >= 0) or testing):
+    if ((curhour == 8 and curmin <= 15 and curmin >= 0 and morning) or testing):
         filename = curday + ".csv"
         csvexists = True if not os.path.exists("gdrive/Late Students/"+filename) else False
         f = open("gdrive/Late Students/" + filename, "a")
