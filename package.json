@@ -29,7 +29,7 @@
     "react-router-dom": "^5.3.0",
     "react-window": "^1.8.6",
     "react-window-size": "^1.2.2",
-    "webpack": "^5.75.0",
+    "webpack": "^5.76.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^4.11.0"
   },
